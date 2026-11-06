@@ -153,8 +153,6 @@ class VrchatApiHandler extends ChangeNotifier{
               print('Failed to fetch world $worldId: $e');
               currentLocation = null;
             }
-          } else {
-            currentLocation = null;
           }
 
           notifyListeners();
