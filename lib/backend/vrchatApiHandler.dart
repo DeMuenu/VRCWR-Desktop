@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
+import 'package:vrcworldvoterdesktop/backend/secureStorage.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class VrchatApiHandler extends ChangeNotifier{
   late final VrchatDart api;
@@ -30,13 +32,22 @@ class VrchatApiHandler extends ChangeNotifier{
   Future<void> initVrchatClient() async {
     if (_isInitialized) return;
 
-    final appDocDir = await getApplicationDocumentsDirectory();
-
     api = VrchatDart(
       userAgent: userAgent,
-      cookiePath: appDocDir.path,
+
     );
     _isInitialized = true;
+
+
+    final secureCookieJar = PersistCookieJar(
+      ignoreExpires: false,
+      storage: SecureStorage(),
+    );
+    
+
+    final interceptors = api.rawApi.dio.interceptors;
+    interceptors.removeWhere((i) => i is CookieManager);
+    interceptors.add(CookieManager(secureCookieJar));
   }
 
   Future<void> cookieLogin() async {
