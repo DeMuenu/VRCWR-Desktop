@@ -17,15 +17,13 @@ class VotePage extends StatefulWidget {
 
 class _VotePageState extends State<VotePage> {
   late VrchatApiHandler vrcApi;
+  String? _lastWorldId;
   final _commentBoxController = TextEditingController();
 
   int generalVoteScore = 0;
-  int clickbaitVoteScore = 0;
-  int aiImagesVoteScore = 0;
-  int aiMeshesVoteScore = 0;
-  int aiVoiceVoteScore = 0;
-  int gamblingVoteScore = 0;
-  int p2wVoteScore = 0;
+
+  Map<String, bool> tags = {}; 
+
   String worldComment = "";
 
 
@@ -33,17 +31,24 @@ class _VotePageState extends State<VotePage> {
   void initState(){
     super.initState();
     vrcApi = widget.vrcApi;
-
+    _lastWorldId = vrcApi.currentLocation?.id;
+    vrcApi.addListener(_handleWorldChange);
   }
 
-  void resetFields(){
-    aiImagesVoteScore = 0;
-    aiMeshesVoteScore = 0;
-    gamblingVoteScore = 0;
-    p2wVoteScore = 0;
-    worldComment = "";
+  void _handleWorldChange() {
+    final worldId = vrcApi.currentLocation?.id;
+    if (worldId == null || worldId == _lastWorldId) return;
+
+    _lastWorldId = worldId;
+    resetFields();
+  }
+
+  void resetFields() {
+    _commentBoxController.clear();
     setState(() {
-      
+      generalVoteScore = 0;
+      tags.clear();
+      worldComment = "";
     });
   }
 
@@ -97,7 +102,7 @@ class _VotePageState extends State<VotePage> {
                   ],),
                 ),
                 SizedBox(height: 10,),
-                Text("   Rating:         Does this world contain:", style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.left,),
+                Text("   Rating:          Does this world contain:", style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.left,),
                 Expanded(child: 
                   GridView.extent(
                     primary: false,
@@ -107,13 +112,42 @@ class _VotePageState extends State<VotePage> {
                     mainAxisExtent: 150,
                     maxCrossAxisExtent: 90,
                     children: [
-                      voteContainer(Icons.how_to_vote, "Quality", generalVoteScore, (score) {setState(() => generalVoteScore = score);}, upVoteIcon: Icons.thumb_up, downVoteIcon: Icons.thumb_down),
-                      voteContainer(Icons.broken_image, "Clickbait", clickbaitVoteScore, (score) {setState(() => clickbaitVoteScore = score);}),
-                      voteContainer(CupertinoIcons.paintbrush, "AI Images", aiImagesVoteScore, (score) {setState(() => aiImagesVoteScore = score);}),
-                      voteContainer(CupertinoIcons.cube, "AI Meshes", aiMeshesVoteScore, (score) {setState(() => aiMeshesVoteScore = score);}),
-                      voteContainer(CupertinoIcons.speaker_1_fill, "AI Voices", aiVoiceVoteScore, (score) {setState(() => aiVoiceVoteScore = score);}),
-                      voteContainer(CupertinoIcons.arrow_right_arrow_left_circle, "Gambling", gamblingVoteScore, (score) {setState(() => gamblingVoteScore = score);}),
-                      voteContainer(CupertinoIcons.creditcard, "P2W", p2wVoteScore, (score) {setState(() => p2wVoteScore = score);}),
+                      voteContainer(
+                        Icons.how_to_vote,
+                        "Like",
+                        generalVoteScore,
+                        (int score) { setState(() => generalVoteScore = score); },
+                        upVoteIcon: Icons.thumb_up,
+                        downVoteIcon: Icons.thumb_down,
+                      ),
+                      tagContainer(
+                        CupertinoIcons.paintbrush,
+                        "AI Images",
+                        tags["aiImagesVoteScore"] ?? false,
+                        (bool score) {
+                          setState(() => tags["aiImagesVoteScore"] = score);
+                        },
+                      ),
+                      tagContainer(
+                        CupertinoIcons.cube,
+                        "AI World",
+                        tags["aiMeshesVoteScore"] ?? false,
+                        (bool score) {
+                          setState(() => tags["aiMeshesVoteScore"] = score);
+                        },
+                      ),
+                      for (int i = 0; i < (vrcApi.currentLocation?.tags.length ?? 0); i++) 
+                        if ((vrcApi.currentLocation?.tags[i] ?? '').startsWith('author_tag_')) ...{
+                          tagContainer(
+                            CupertinoIcons.tag,
+                            (vrcApi.currentLocation?.tags[i] ?? '').replaceFirst('author_tag_', ''),
+                            tags[vrcApi.currentLocation?.tags[i] ?? ''] ?? false,
+                            (bool score) {
+                              setState(() => tags[vrcApi.currentLocation?.tags[i] ?? ''] = score);
+                            },
+                          ),
+                        }
+                        
                     ],
                   ),
 
@@ -161,9 +195,10 @@ class _VotePageState extends State<VotePage> {
     IconData upVoteIcon = Icons.check,
     IconData downVoteIcon = Icons.close,
   }) {
-    return DecoratedBox(
+    return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: const Color.fromARGB(255, 73, 73, 73)),
-
+      width: 90,
+      height: 150,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -176,6 +211,41 @@ class _VotePageState extends State<VotePage> {
           IconButton(onPressed: ()  => (value != -1) ? onScoreChanged(-1) : onScoreChanged(0), icon: Icon(downVoteIcon, color: (value != -1) ? Colors.white : Colors.blue)),
           Spacer(),
         ],),
+    );
+  }
+
+  Widget tagContainer(
+    IconData currentIcon,
+    String text,
+    bool value,
+    ValueChanged<bool> onScoreChanged
+    ) {
+    return SizedBox(
+      width: 90,
+      height: 90,
+      child: 
+          Material(
+            borderRadius: BorderRadius.circular(12),
+            clipBehavior: Clip.antiAlias,
+            color: (value != true) ? Color.fromARGB(255, 73, 73, 73) : Color.fromARGB(255, 0, 33, 3),
+            child: 
+              InkWell(
+                onTap: () {
+                  onScoreChanged(!value);
+                },
+                child: 
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(currentIcon, size: 30, color: (value != true) ? Colors.white : Colors.blue),
+                      Text(text, style: TextStyle(fontSize: 15, color: (value != true) ? Colors.white : Colors.blue)),
+                    ],
+                  ),
+              ),
+            )
+          
+          
     );
   }
 

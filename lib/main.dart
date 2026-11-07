@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
-import 'package:vrcworldvoterdesktop/pages/login.dart';
+import 'package:vrcworldvoterdesktop/pages/loginVrc.dart';
+import 'package:vrcworldvoterdesktop/pages/loginVoting.dart';
 import 'package:vrcworldvoterdesktop/pages/votePage.dart';
 import 'dart:io';
 
@@ -18,9 +20,10 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({super.key}) : api = VrchatApiHandler();
+  MyApp({super.key}) : vrchatApi = VrchatApiHandler();
 
-  final VrchatApiHandler api;
+  final VrchatApiHandler vrchatApi;
+  final voteApi = VoteApiHandler();
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -34,8 +37,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initialize() async {
-    await widget.api.initVrchatClient();
-    await widget.api.cookieLogin();
+    await widget.vrchatApi.initVrchatClient();
+    await widget.vrchatApi.cookieLogin();
     setState(() {
     });
   }
@@ -43,10 +46,20 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData.dark(),
       home:  
         ListenableBuilder(
-          listenable: widget.api,
-          builder: (context, child) {return !widget.api.isLoggedIn ? LoginScreen(api: widget.api) : VotePage(widget.api);},
+          listenable: Listenable.merge([
+            widget.vrchatApi,
+            widget.voteApi,
+          ]),
+          builder: (context, child) {return !widget.vrchatApi.isLoggedIn ? 
+              VRCLoginScreen(api: widget.vrchatApi) 
+            : 
+              ((!widget.voteApi.isLoggedIn) ? 
+                  VoteLoginScreen(voteApi: widget.voteApi, vrchatApi: widget.vrchatApi,) 
+                : 
+                  VotePage(widget.vrchatApi));},
         )
     );
   }

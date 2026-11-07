@@ -24,17 +24,33 @@ class UpstreamWorldVoteInfo {
 class VoteApiHandler extends ChangeNotifier{
 
   late String sessionToken;
+  bool isLoggedIn = false;
+  bool isRegisteredUser = true;
 
-  Future<bool> login() async{
-
-    //Todo 
-
-    return false;
+  Future<bool> doesAccountExists() async {
+    await Future.delayed(const Duration(seconds: 3));
+    isRegisteredUser = false; // TODO Real function
+    notifyListeners();
+    return true;
   }
 
-  
-  
+  Future<bool> login(String userId, String password) async{
 
+    //Todo 
+    await Future.delayed(const Duration(seconds: 3));
+    isLoggedIn = true;
+    notifyListeners();
+    return true;
+  }
 
+  Future<bool> createAccount(String userId, String password, String eMail, String registrationToken) async{
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> publishReview() async{
+    notifyListeners();
+    return true;
+  }
  
 }

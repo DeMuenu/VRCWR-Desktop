@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.api});
+class VRCLoginScreen extends StatefulWidget {
+  const VRCLoginScreen({super.key, required this.api});
 
   final VrchatApiHandler api;
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<VRCLoginScreen> createState() => _VRCLoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _VRCLoginScreenState extends State<VRCLoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _twoFactorController = TextEditingController();

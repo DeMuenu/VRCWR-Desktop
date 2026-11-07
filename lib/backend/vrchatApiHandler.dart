@@ -12,6 +12,7 @@ class VrchatApiHandler extends ChangeNotifier{
   bool _isInitialized = false;
 
   World? currentLocation;
+  var currentUser;
 
 
   static const userAgent = VrchatUserAgent(
@@ -41,8 +42,11 @@ class VrchatApiHandler extends ChangeNotifier{
   Future<void> cookieLogin() async {
     final (loginSuccess, loginError) = await api.auth.login();
 
-    authResponse = loginSuccess!.data;
+    authResponse = loginSuccess?.data;
 
+    if (authResponse == null){
+      return;
+    }
 
     // Check if the account requires 2FA verification
     if (authResponse.requiresTwoFactorAuth) {
@@ -50,15 +54,16 @@ class VrchatApiHandler extends ChangeNotifier{
       return;
     }
 
-    final currentUser = api.auth.currentUser;
+    currentUser = api.auth.currentUser;
     if (currentUser == null) {
       return;
     }
 
-    print('Successfully logged in as: ${currentUser.displayName} (${currentUser.id})');
+    print('Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})');
     startRealtimeStream();
     isLoggedIn = true;
     requires2FA = false;
+    notifyListeners();
   }
 
   Future<bool> loginToVrchat(String username, String password) async {
@@ -80,12 +85,14 @@ class VrchatApiHandler extends ChangeNotifier{
       return true;
     }
 
-    final currentUser = api.auth.currentUser;
+    currentUser = api.auth.currentUser;
     if (currentUser != null) {
       print(
-        'Successfully logged in as: ${currentUser.displayName} (${currentUser.id})',
+        'Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})',
       );
       startRealtimeStream();
+      isLoggedIn = true;
+      notifyListeners();
     }
     return true;
   }
@@ -112,6 +119,9 @@ class VrchatApiHandler extends ChangeNotifier{
         'Successfully logged in as: ${currentUser.displayName} (${currentUser.id})',
       );
       startRealtimeStream();
+      isLoggedIn = true;
+      requires2FA = false;
+      notifyListeners();
     }
     return true;
   }
