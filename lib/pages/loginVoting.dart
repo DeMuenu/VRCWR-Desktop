@@ -92,8 +92,7 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+    return Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
@@ -150,7 +149,6 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

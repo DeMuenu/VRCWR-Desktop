@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
+import 'package:vrcworldvoterdesktop/pages/appBar.dart';
 import 'package:vrcworldvoterdesktop/pages/loginVrc.dart';
 import 'package:vrcworldvoterdesktop/pages/loginVoting.dart';
 import 'package:vrcworldvoterdesktop/pages/votePage.dart';
@@ -49,19 +50,27 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.dark(),
       
       home:  
-        ListenableBuilder(
-          listenable: Listenable.merge([
-            widget.vrchatApi,
-            widget.voteApi,
-          ]),
-          builder: (context, child) {return !widget.vrchatApi.isLoggedIn ? 
-              VRCLoginScreen(api: widget.vrchatApi) 
-            : 
-              ((!widget.voteApi.isLoggedIn) ? 
-                  VoteLoginScreen(voteApi: widget.voteApi, vrchatApi: widget.vrchatApi,) 
-                : 
-                  VotePage(widget.vrchatApi));},
+        Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: appBar(),
+        ),
+        body: 
+          ListenableBuilder(
+            listenable: Listenable.merge([
+              widget.vrchatApi,
+              widget.voteApi,
+            ]),
+            builder: (context, child) {return !widget.vrchatApi.isLoggedIn ? 
+                VRCLoginScreen(api: widget.vrchatApi) 
+              : 
+                ((!widget.voteApi.isLoggedIn) ? 
+                    VoteLoginScreen(voteApi: widget.voteApi, vrchatApi: widget.vrchatApi,) 
+                  : 
+                    VotePage(widget.vrchatApi));},
+          ),
         )
+        
     );
   }
 }

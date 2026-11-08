@@ -79,8 +79,7 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+    return Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
@@ -133,7 +132,6 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }

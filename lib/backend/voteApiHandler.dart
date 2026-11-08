@@ -57,7 +57,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   String? sessionToken;
   String? lastErrorMessage;
-  bool isLoggedIn = true; //Todo revert
+  bool isLoggedIn = false; //Todo revert
   bool isRegisteredUser = false;
 
   Map<String, String> get _defaultHeaders => {
@@ -69,6 +69,14 @@ class VoteApiHandler extends ChangeNotifier {
         ..._defaultHeaders,
         if (sessionToken != null) 'Authorization': 'Bearer $sessionToken',
       };
+
+  Future<void> init() async {
+    final secureStorage = SecureStorage();
+    sessionToken = await secureStorage.read("vote_token");
+    isLoggedIn = sessionToken != null && sessionToken!.isNotEmpty;
+    isRegisteredUser = isLoggedIn;
+    notifyListeners();
+  }
 
   //Register a User (POST api/user_register)
   Future<bool> createAccount({

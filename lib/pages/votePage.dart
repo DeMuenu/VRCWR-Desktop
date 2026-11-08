@@ -55,12 +55,8 @@ class _VotePageState extends State<VotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: const Color.fromARGB(255, 15, 15, 15),
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: appBar(),
-        ),
-        body:
+    return Container(color: const Color.fromARGB(255, 15, 15, 15),
+        child:
           Center(child: 
             vrcApi.currentLocation != null ?
             Column(
