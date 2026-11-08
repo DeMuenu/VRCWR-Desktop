@@ -1,8 +1,7 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:vrcworldvoterdesktop/backend/appLogic.dart';
 
-Widget appBar() {
+Widget appBar(Applogic aL) {
     return Container(
       decoration: BoxDecoration(color: const Color.fromARGB(255, 47, 47, 47)),
       width: 90,
@@ -21,7 +20,8 @@ Widget appBar() {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
                   onTap: () {
-                    print("Worlds clicked");
+                    aL.selectedTab = TabSelection.worlds;
+                    
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -44,7 +44,10 @@ Widget appBar() {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
                   onTap: () {
-                    print("Vote clicked");
+                    aL.selectedTab = TabSelection.voting;
+                    if(!aL.voteApi.isLoggedIn){
+                      aL.isExistingVotingUser();
+                    }
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),

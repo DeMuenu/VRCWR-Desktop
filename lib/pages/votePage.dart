@@ -2,14 +2,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
-import 'package:vrcworldvoterdesktop/pages/appBar.dart';
 
 class VotePage extends StatefulWidget {
   final VrchatApiHandler vrcApi;
+  final VoteApiHandler voteApi;
 
 
-  const VotePage(this.vrcApi, {super.key});
+  const VotePage(this.vrcApi, this.voteApi,{super.key});
 
   @override
   State<VotePage> createState() => _VotePageState();
@@ -102,103 +103,135 @@ class _VotePageState extends State<VotePage> {
                     
                   ],),
                 ),
-                SizedBox(height: 10,),
-                Text("   Rating:          Does this world contain:", style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.left,),
-                Expanded(child: 
-                  GridView.extent(
-                    primary: false,
-                    padding: const EdgeInsets.only(left: 12, right: 12),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    mainAxisExtent: 150,
-                    maxCrossAxisExtent: 90,
-                    children: [
-                      voteContainer(
-                        Icons.how_to_vote,
-                        "Like",
-                        generalVoteScore,
-                        (int score) { setState(() => generalVoteScore = score); },
-                        upVoteIcon: Icons.thumb_up,
-                        downVoteIcon: Icons.thumb_down,
-                      ),
-                      tagContainer(
-                        CupertinoIcons.paintbrush,
-                        "AI Images",
-                        tags["aiImagesVoteScore"] ?? false,
-                        (bool score) {
-                          setState(() => tags["aiImagesVoteScore"] = score);
-                        },
-                      ),
-                      tagContainer(
-                        CupertinoIcons.cube,
-                        "AI World",
-                        tags["aiMeshesVoteScore"] ?? false,
-                        (bool score) {
-                          setState(() => tags["aiMeshesVoteScore"] = score);
-                        },
-                      ),
-                      for (int i = 0; i < (vrcApi.currentLocation?.tags.length ?? 0); i++) 
-                        if ((vrcApi.currentLocation?.tags[i] ?? '').startsWith('author_tag_')) ...{
-                          tagContainer(
-                            CupertinoIcons.tag,
-                            (vrcApi.currentLocation?.tags[i] ?? '').replaceFirst('author_tag_', ''),
-                            tags[vrcApi.currentLocation?.tags[i] ?? ''] ?? false,
-                            (bool score) {
-                              setState(() => tags[vrcApi.currentLocation?.tags[i] ?? ''] = score);
-                            },
-                          ),
-                        }
-                        
-                    ],
-                  ),
-
-                ),
-
-                SizedBox(height: 30,),
-
-                Padding(padding: const .symmetric(horizontal: 16), child: 
-                  DecoratedBox(
-                    decoration: BoxDecoration(color: Color.fromARGB(255, 66, 66, 66), borderRadius: BorderRadius.circular(12)),
-                    child: Padding(padding: const .symmetric(horizontal: 16),
-                    child: TextField(
-                        controller: _commentBoxController,
-                        decoration: const InputDecoration(
-                          labelText: 'Leave a PUBLIC comment, your username will be shown. (optional)',
-                          labelStyle: TextStyle(color: Colors.white),
+                if (widget.voteApi.worldExistsOnServer) ...([
+                  SizedBox(height: 10,),
+                  Text("   Rating:          Does this world contain:", style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.left,),
+                  Expanded(child: 
+                    GridView.extent(
+                      primary: false,
+                      padding: const EdgeInsets.only(left: 12, right: 12),
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      mainAxisExtent: 150,
+                      maxCrossAxisExtent: 90,
+                      children: [
+                        voteContainer(
+                          Icons.how_to_vote,
+                          "Like",
+                          generalVoteScore,
+                          (int score) { setState(() => generalVoteScore = score); },
+                          upVoteIcon: Icons.thumb_up,
+                          downVoteIcon: Icons.thumb_down,
+                        ),
+                        tagContainer(
+                          CupertinoIcons.paintbrush,
+                          "AI Images",
+                          tags["aiImagesVoteScore"] ?? false,
+                          (bool score) {
+                            setState(() => tags["aiImagesVoteScore"] = score);
+                          },
+                        ),
+                        tagContainer(
+                          CupertinoIcons.cube,
+                          "AI World",
+                          tags["aiMeshesVoteScore"] ?? false,
+                          (bool score) {
+                            setState(() => tags["aiMeshesVoteScore"] = score);
+                          },
+                        ),
+                        for (int i = 0; i < (vrcApi.currentLocation?.tags.length ?? 0); i++) 
+                          if ((vrcApi.currentLocation?.tags[i] ?? '').startsWith('author_tag_')) ...{
+                            tagContainer(
+                              CupertinoIcons.tag,
+                              (vrcApi.currentLocation?.tags[i] ?? '').replaceFirst('author_tag_', ''),
+                              tags[vrcApi.currentLocation?.tags[i] ?? ''] ?? false,
+                              (bool score) {
+                                setState(() => tags[vrcApi.currentLocation?.tags[i] ?? ''] = score);
+                              },
+                            ),
+                          }
                           
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 30,),
+
+                  Padding(padding: const .symmetric(horizontal: 16), child: 
+                    DecoratedBox(
+                      decoration: BoxDecoration(color: Color.fromARGB(255, 66, 66, 66), borderRadius: BorderRadius.circular(12)),
+                      child: Padding(padding: const .symmetric(horizontal: 16),
+                      child: TextField(
+                          controller: _commentBoxController,
+                          decoration: const InputDecoration(
+                            labelText: 'Leave a PUBLIC comment, your username will be shown. (optional)',
+                            labelStyle: TextStyle(color: Colors.white),
+                            
+                          ),
+                          style: TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.text,
+                          minLines: 3,
+                          maxLines: 5,
+                          maxLength: 500,
+                          
+                          onSubmitted: (_) {worldComment = _commentBoxController.text;},
                         ),
-                        style: TextStyle(color: Colors.white),
-                        keyboardType: TextInputType.text,
-                        minLines: 3,
-                        maxLines: 5,
-                        maxLength: 500,
-                        
-                        onSubmitted: (_) {worldComment = _commentBoxController.text;},
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 30,),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 120,
-                    child: Material(
-                        color: Color.fromARGB(255, 66, 66, 66),
-                        borderRadius: BorderRadius.circular(16),
-                        child: InkWell(
+                  SizedBox(height: 30,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 120,
+                      child: Material(
+                          color: Color.fromARGB(255, 66, 66, 66),
                           borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          print("Submit clicked");
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("Submit", textAlign: TextAlign.center),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            print("Submit clicked");
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Submit", textAlign: TextAlign.center),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                ]
+
+                )
+                else 
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 120,
+                      child: Material(
+                          color: Color.fromARGB(255, 66, 66, 66),
+                          borderRadius: BorderRadius.circular(16),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                          onTap: () async{
+                            if(widget.vrcApi.currentLocation != null){
+                              if (await widget.voteApi.addWorld(vrcApi.currentLocation?.id ?? "000")){
+                                await widget.voteApi.updateCurrentWorld();
+                              }
+                            }
+                            setState(() {});
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Be the first to create a review.", textAlign: TextAlign.center),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                if(widget.voteApi.lastErrorMessage != null) ...{
+                  Text(widget.voteApi.lastErrorMessage ?? "Error", style: TextStyle(color: Colors.red),)
+                }
                 
               ]
             )

@@ -4,24 +4,81 @@ import 'package:http/http.dart' as http;
 import 'package:vrcworldvoterdesktop/backend/secureStorage.dart';
 
 class DownstreamWorldVoteInfo {
+  final int id;
   final String worldId;
-  final int votes;
-  final Map<String, int> tags;
-  final List<String> comments;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String authorId;
+  final String authorName;
+  final int capacity;
+  final String description;
+  final int favorites;
+  final String imageUrl;
+  final String name;
+  final DateTime publicationDate;
+  final int recommendedCapacity;
+  final String releaseStatus;
+  final String thumbnailImageUrl;
+  final int version;
+  final int visits;
+  final int likes;
+  final int dislikes;
+  final int comments;
+  final num aiScore;
+  final DateTime lastBaseDataSync;
 
   DownstreamWorldVoteInfo({
+    required this.id,
     required this.worldId,
-    required this.votes,
-    required this.tags,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.authorId,
+    required this.authorName,
+    required this.capacity,
+    required this.description,
+    required this.favorites,
+    required this.imageUrl,
+    required this.name,
+    required this.publicationDate,
+    required this.recommendedCapacity,
+    required this.releaseStatus,
+    required this.thumbnailImageUrl,
+    required this.version,
+    required this.visits,
+    required this.likes,
+    required this.dislikes,
     required this.comments,
+    required this.aiScore,
+    required this.lastBaseDataSync,
   });
 
   factory DownstreamWorldVoteInfo.fromJson(Map<String, dynamic> json) {
+    final epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
     return DownstreamWorldVoteInfo(
-      worldId: json['world_id'] ?? '',
-      votes: json['votes'] ?? 0,
-      tags: Map<String, int>.from(json['tags'] ?? {}),
-      comments: List<String>.from(json['comments'] ?? []),
+      id: json['id'] as int? ?? 0,
+      worldId: json['world_id'] as String? ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? epoch,
+      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? epoch,
+      authorId: json['author_id'] as String? ?? '',
+      authorName: json['author_name'] as String? ?? '',
+      capacity: json['capacity'] as int? ?? 0,
+      description: json['description'] as String? ?? '',
+      favorites: json['favorites'] as int? ?? 0,
+      imageUrl: json['image_url'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      publicationDate:
+          DateTime.tryParse(json['publication_date'] as String? ?? '') ?? epoch,
+      recommendedCapacity: json['recommended_capacity'] as int? ?? 0,
+      releaseStatus: json['release_status'] as String? ?? '',
+      thumbnailImageUrl: json['thumbnail_image_url'] as String? ?? '',
+      version: json['version'] as int? ?? 0,
+      visits: json['visits'] as int? ?? 0,
+      likes: json['likes'] as int? ?? 0,
+      dislikes: json['dislikes'] as int? ?? 0,
+      comments: json['comments'] as int? ?? 0,
+      aiScore: json['ai_score'] as num? ?? 0,
+      lastBaseDataSync:
+          DateTime.tryParse(json['last_base_data_sync'] as String? ?? '') ?? epoch,
     );
   }
 }
@@ -53,12 +110,19 @@ class UpstreamWorldVoteInfo {
 }
 
 class VoteApiHandler extends ChangeNotifier {
-  static const String _baseUrl = 'http://localhost:8000';
+  static const String _baseUrl = 'https://vrcwr.kokos-labs.at';
 
   String? sessionToken;
   String? lastErrorMessage;
   bool isLoggedIn = false; //Todo revert
   bool isRegisteredUser = false;
+
+  //World bools
+  String currentWorldId = "000";
+  DownstreamWorldVoteInfo? currentWorld = DownstreamWorldVoteInfo.fromJson({
+    'world_id': '000',
+  });
+  bool worldExistsOnServer = false;
 
   Map<String, String> get _defaultHeaders => {
         'Content-Type': 'application/json',
@@ -70,12 +134,44 @@ class VoteApiHandler extends ChangeNotifier {
         if (sessionToken != null) 'Authorization': 'Bearer $sessionToken',
       };
 
-  Future<void> init() async {
+  VoteApiHandler() {
+    initVoting();
+  }
+
+  Future<void> initVoting() async {
     final secureStorage = SecureStorage();
     sessionToken = await secureStorage.read("vote_token");
+    print(sessionToken);
     isLoggedIn = sessionToken != null && sessionToken!.isNotEmpty;
-    isRegisteredUser = isLoggedIn;
     notifyListeners();
+  }
+
+  Future<bool> userExists({required String userId}) async{
+    final Uri url = Uri.parse('$_baseUrl/api/user_exists?user_id=$userId');
+
+    try {
+      final response = await http.get(
+        url,
+      );
+
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 201) {
+        isRegisteredUser = true;
+        notifyListeners();
+        return true;
+      } 
+      if (response.statusCode == 401) {
+        isRegisteredUser = false; //TODO make better
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      lastErrorMessage = 'Network error: $e';
+      notifyListeners();
+      return false;
+    }
+    return false;
   }
 
   //Register a User (POST api/user_register)
@@ -169,6 +265,98 @@ class VoteApiHandler extends ChangeNotifier {
     }
   }
 
+  Future<bool> joinNewWorld(String worldId) async{
+    currentWorldId = worldId;
+    worldExistsOnServer = await worldExist(worldId = worldId);
+    if (worldExistsOnServer){
+      updateCurrentWorld();
+    }
+    return true;
+  }
+
+
+
+  Future<bool> updateCurrentWorld() async{
+    currentWorld = await loadWorldData(currentWorldId);
+    worldExistsOnServer = currentWorld != null;
+    print(currentWorld);
+    print(currentWorld?.authorName ?? "");
+    return currentWorld != null;
+  }
+
+  Future<bool> worldExist(String worldId) async {
+    final Uri url = Uri.parse('$_baseUrl/api/user_exists?world_id=$worldId');
+    try {
+      final response = await http.get(
+        url,
+      );
+
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 201) {
+        isRegisteredUser = true;
+        notifyListeners();
+        return true;
+      } 
+      if (response.statusCode == 401) {
+        isRegisteredUser = false; //TODO make better
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      lastErrorMessage = 'Network error: $e';
+      notifyListeners();
+      return false;
+    }
+    return false;
+  }
+
+  //Add a World (PUT api/world_add) - Requires Auth
+  Future<bool> addWorld(String worldId) async {
+    if (sessionToken == null) {
+      lastErrorMessage = 'You must be logged in to add a world.';
+      notifyListeners();
+      return false;
+    }
+
+    final Uri url = Uri.parse('$_baseUrl/api/world_add');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: _authHeaders,
+        body: jsonEncode({
+          'world_id': worldId,
+        }),
+      );
+
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 201) {
+        lastErrorMessage = null;
+        notifyListeners();
+        return true;
+      } else if (response.statusCode == 401) {
+        // Token expired or was replaced by another login
+        SecureStorage secureStorage = SecureStorage();
+        secureStorage.delete("vote_token");
+        isLoggedIn = false;
+        sessionToken = null;
+        lastErrorMessage = 'Session expired. Please log in again.';
+        notifyListeners();
+        return false;
+      } else {
+        lastErrorMessage = data['message'] ?? 'Failed to add world (${response.statusCode})';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      lastErrorMessage = 'Network error: $e';
+      notifyListeners();
+      return false;
+    }
+  }
+
   //Add a World Review (POST api/world_add_review) - Requires Auth
   Future<bool> publishReview(UpstreamWorldVoteInfo reviewInfo) async {
     if (sessionToken == null) {
@@ -215,7 +403,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   //4. Load World Data (No Auth Required)
   Future<DownstreamWorldVoteInfo?> loadWorldData(String worldId) async {
-    final Uri url = Uri.parse('$_baseUrl/api/world_load').replace(
+    final Uri url = Uri.parse('$_baseUrl/api/world_get?world_id=$worldId').replace(
       queryParameters: {'world_id': worldId},
     );
 

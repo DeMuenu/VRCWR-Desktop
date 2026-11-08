@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
+import 'package:vrcworldvoterdesktop/backend/appLogic.dart';
 import 'package:vrcworldvoterdesktop/backend/secureStorage.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
 
 class VrchatApiHandler extends ChangeNotifier{
   late final VrchatDart api;
 
   late var authResponse;
+
+  late Applogic aL;
 
   bool isLoggedIn = false;
   bool requires2FA = false;
@@ -28,6 +32,10 @@ class VrchatApiHandler extends ChangeNotifier{
   };
 
   VrchatApiHandler();
+
+  void setAL(Applogic appLogic){
+    aL = appLogic;
+  }
 
   Future<void> initVrchatClient() async {
     if (_isInitialized) return;
@@ -170,6 +178,13 @@ class VrchatApiHandler extends ChangeNotifier{
             try {
               final response = await api.rawApi.getWorldsApi().getWorld(worldId: worldId);
               currentLocation = response.data;
+
+              if (currentLocation != null){
+                aL.voteApi.joinNewWorld(currentLocation!.id);
+              }
+              
+
+
             } catch (e) {
               print('Failed to fetch world $worldId: $e');
               currentLocation = null;

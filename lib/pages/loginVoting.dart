@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vrchat_dart/vrchat_dart.dart';
 import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
 
@@ -61,7 +60,7 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
       }
     }
     else{
-      if(await widget.voteApi.login(widget.vrchatApi.currentUser!.id, _votingPasswordController.text)){
+      if(await widget.voteApi.login(_emailController.text, _votingPasswordController.text)){
 
       }
       else{
@@ -144,6 +143,10 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
                 if (_message != null) ...[
                   const SizedBox(height: 16),
                   Text(_message!, textAlign: TextAlign.center),
+                ],
+                if (widget.voteApi.lastErrorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(widget.voteApi.lastErrorMessage!, textAlign: TextAlign.center),
                 ],
               ],
             ),
