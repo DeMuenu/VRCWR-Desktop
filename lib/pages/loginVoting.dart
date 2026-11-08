@@ -41,8 +41,15 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
           _message = "VRChat user failed to load";
         });
       }
-      if(await widget.voteApi.createAccount(widget.vrchatApi.currentUser!.id, _votingPasswordController.text, _emailController.text, _tokenController.text)){
-        if(await widget.voteApi.login(widget.vrchatApi.currentUser!.id, _votingPasswordController.text)){
+      if (await widget.voteApi.createAccount(
+        username: widget.vrchatApi.currentUser!.displayName,
+        userId: widget.vrchatApi.currentUser!.id,
+        eMail: _emailController.text,
+        password: _votingPasswordController.text,
+        registrationToken: _tokenController.text,
+        iconLink: widget.vrchatApi.currentUser!.iconUrl ?? "",
+      )) {
+        if(await widget.voteApi.login(_emailController.text, _votingPasswordController.text)){
           _message = "Login successful";
         }
         else{
@@ -75,7 +82,7 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
   }
 
   Future<void> _initialize() async {
-    await widget.voteApi.doesAccountExists();
+    //await widget.voteApi.doesAccountExists();
     setState(() {
       _isLoading = false;
     });

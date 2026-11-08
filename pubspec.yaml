@@ -41,6 +41,7 @@ dependencies:
   cryptography: ^2.9.0
   cookie_jar: ^4.0.9
   dio_cookie_manager: ^3.5.0
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
+import 'package:vrcworldvoterdesktop/pages/appBar.dart';
 
 class VotePage extends StatefulWidget {
   final VrchatApiHandler vrcApi;
@@ -55,11 +56,15 @@ class _VotePageState extends State<VotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: const Color.fromARGB(255, 15, 15, 15),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: appBar(),
+        ),
         body:
           Center(child: 
             vrcApi.currentLocation != null ?
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
                   padding: const .symmetric(horizontal: 16),
@@ -178,6 +183,27 @@ class _VotePageState extends State<VotePage> {
                   ),
                 ),
                 SizedBox(height: 30,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 120,
+                    child: Material(
+                        color: Color.fromARGB(255, 66, 66, 66),
+                        borderRadius: BorderRadius.circular(16),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          print("Submit clicked");
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("Submit", textAlign: TextAlign.center),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
               ]
             )
             :

@@ -14,7 +14,7 @@ class VrchatApiHandler extends ChangeNotifier{
   bool _isInitialized = false;
 
   World? currentLocation;
-  var currentUser;
+  CurrentUser? currentUser;
 
 
   static const userAgent = VrchatUserAgent(
