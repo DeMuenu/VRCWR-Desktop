@@ -112,7 +112,7 @@ class _VotePageState extends State<VotePage> {
                       padding: const EdgeInsets.only(left: 12, right: 12),
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      mainAxisExtent: 150,
+                      mainAxisExtent: 160,
                       maxCrossAxisExtent: 90,
                       children: [
                         voteContainer(
@@ -123,33 +123,13 @@ class _VotePageState extends State<VotePage> {
                           upVoteIcon: Icons.thumb_up,
                           downVoteIcon: Icons.thumb_down,
                         ),
-                        tagContainer(
-                          CupertinoIcons.paintbrush,
-                          "AI Images",
-                          tags["aiImagesVoteScore"] ?? false,
-                          (bool score) {
-                            setState(() => tags["aiImagesVoteScore"] = score);
-                          },
-                        ),
-                        tagContainer(
-                          CupertinoIcons.cube,
-                          "AI World",
-                          tags["aiMeshesVoteScore"] ?? false,
-                          (bool score) {
-                            setState(() => tags["aiMeshesVoteScore"] = score);
-                          },
-                        ),
-                        for (int i = 0; i < (vrcApi.currentLocation?.tags.length ?? 0); i++) 
-                          if ((vrcApi.currentLocation?.tags[i] ?? '').startsWith('author_tag_')) ...{
-                            tagContainer(
-                              CupertinoIcons.tag,
-                              (vrcApi.currentLocation?.tags[i] ?? '').replaceFirst('author_tag_', ''),
-                              tags[vrcApi.currentLocation?.tags[i] ?? ''] ?? false,
-                              (bool score) {
-                                setState(() => tags[vrcApi.currentLocation?.tags[i] ?? ''] = score);
-                              },
-                            ),
-                          }
+                        for (int i = 0; i < (widget.voteApi.currentWorldTags.length); i++) 
+                          voteContainer(
+                            CupertinoIcons.tag, 
+                            widget.voteApi.currentWorldTags[i].tag, 
+                            0, //todo
+                            (score) {setState(() => generalVoteScore = score);}
+                          ),
                           
                       ],
                     ),

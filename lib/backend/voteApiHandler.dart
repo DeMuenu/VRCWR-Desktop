@@ -109,6 +109,49 @@ class UpstreamWorldVoteInfo {
   }
 }
 
+class WorldTag {
+  final int id;
+  final String worldId;
+  final String tag;
+  final int upvotes;
+  final int downvotes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  WorldTag({
+    required this.id,
+    required this.worldId,
+    required this.tag,
+    required this.upvotes,
+    required this.downvotes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory WorldTag.fromJson(Map<String, dynamic> json) {
+    final epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    return WorldTag(
+      id: json['id'] as int? ?? 0,
+      worldId: json['world_id'] as String? ?? '',
+      tag: json['tag'] as String? ?? '',
+      upvotes: json['upvotes'] as int? ?? 0,
+      downvotes: json['downvotes'] as int? ?? 0,
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? epoch,
+      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? epoch,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'world_id': worldId,
+        'tag': tag,
+        'upvotes': upvotes,
+        'downvotes': downvotes,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+      };
+}
+
 class VoteApiHandler extends ChangeNotifier {
   static const String _baseUrl = 'https://vrcwr.kokos-labs.at';
 
@@ -122,6 +165,7 @@ class VoteApiHandler extends ChangeNotifier {
   DownstreamWorldVoteInfo? currentWorld = DownstreamWorldVoteInfo.fromJson({
     'world_id': '000',
   });
+  List<WorldTag> currentWorldTags = [];
   bool worldExistsOnServer = false;
 
   Map<String, String> get _defaultHeaders => {
@@ -154,13 +198,12 @@ class VoteApiHandler extends ChangeNotifier {
         url,
       );
 
-      final Map<String, dynamic> data = jsonDecode(response.body);
       print(response.statusCode);
       if (response.statusCode == 201) {
         isRegisteredUser = true;
         notifyListeners();
         return true;
-      } 
+      }
       if (response.statusCode == 401) {
         isRegisteredUser = false; //TODO make better
         notifyListeners();
@@ -279,6 +322,7 @@ class VoteApiHandler extends ChangeNotifier {
   Future<bool> updateCurrentWorld() async{
     currentWorld = await loadWorldData(currentWorldId);
     worldExistsOnServer = currentWorld != null;
+    currentWorldTags = await loadWorldTags(currentWorldId) ?? [];
     print(currentWorld);
     print(currentWorld?.authorName ?? "");
     return currentWorld != null;
@@ -291,13 +335,12 @@ class VoteApiHandler extends ChangeNotifier {
         url,
       );
 
-      final Map<String, dynamic> data = jsonDecode(response.body);
       print(response.statusCode);
       if (response.statusCode == 201) {
         isRegisteredUser = true;
         notifyListeners();
         return true;
-      } 
+      }
       if (response.statusCode == 401) {
         isRegisteredUser = false; //TODO make better
         notifyListeners();
@@ -416,6 +459,45 @@ class VoteApiHandler extends ChangeNotifier {
         return DownstreamWorldVoteInfo.fromJson(data);
       } else {
         lastErrorMessage = data['message'] ?? 'Failed to load world (${response.statusCode})';
+        notifyListeners();
+        return null;
+      }
+    } catch (e) {
+      lastErrorMessage = 'Network error: $e';
+      notifyListeners();
+      return null;
+    }
+  }
+
+
+
+  // Load world tags
+  Future<List<WorldTag>?> loadWorldTags(String worldId) async {
+    final Uri url = Uri.parse('$_baseUrl/api/world_tags_get').replace(
+      queryParameters: {'world_id': worldId},
+    );
+
+    try {
+      final response = await http.get(url, headers: _defaultHeaders);
+      final dynamic decoded = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        if (decoded is! List) {
+          lastErrorMessage = 'Unexpected world tags response format.';
+          notifyListeners();
+          return null;
+        }
+
+        lastErrorMessage = null;
+        final worldTags = decoded
+            .map((item) => WorldTag.fromJson(item as Map<String, dynamic>))
+            .toList();
+        return worldTags;
+      } else {
+        final message = decoded is Map && decoded['message'] is String
+            ? decoded['message'] as String
+            : 'Failed to load world tags (${response.statusCode})';
+        lastErrorMessage = message;
         notifyListeners();
         return null;
       }
