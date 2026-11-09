@@ -108,7 +108,9 @@ class UpstreamWorldVoteInfo {
       'review_value': vote,
       if (comment != null && comment!.isNotEmpty) 'review_comment': comment,
       if (tags != null && tags!.isNotEmpty)
-        'review_tags': tags!.map((key, value) => MapEntry(key.toString(), value)),
+        'review_tags': tags!.entries
+          .map((entry) => {'id': entry.key, 'value': entry.value})
+            .toList(),
     };
   }
 }
@@ -162,7 +164,7 @@ class VoteApiHandler extends ChangeNotifier {
   String? sessionToken;
   String? lastErrorMessage;
   bool isLoggedIn = false;
-  bool isRegisteredUser = false;
+  bool isRegisteredUser = true;
 
   //World bools
   String currentWorldId = "000";
@@ -315,8 +317,9 @@ class VoteApiHandler extends ChangeNotifier {
   Future<bool> joinNewWorld(String worldId) async{
     currentWorldId = worldId;
     worldExistsOnServer = await worldExist(worldId = worldId);
+    print(worldExistsOnServer);
     if (worldExistsOnServer){
-      updateCurrentWorld();
+      await updateCurrentWorld();
     }
     return true;
   }
@@ -333,22 +336,21 @@ class VoteApiHandler extends ChangeNotifier {
   }
 
   Future<bool> worldExist(String worldId) async {
-    final Uri url = Uri.parse('$_baseUrl/api/user_exists?world_id=$worldId');
+    final Uri url = Uri.parse('$_baseUrl/api/world_exists?world_id=$worldId');
     try {
       final response = await http.get(
         url,
       );
-
+      print(worldId);
+      print(response.body);
       print(response.statusCode);
       if (response.statusCode == 201) {
-        isRegisteredUser = true;
         notifyListeners();
         return true;
       }
       if (response.statusCode == 401) {
-        isRegisteredUser = false;
         notifyListeners();
-        return true;
+        return false;
       }
     } catch (e) {
       lastErrorMessage = 'Network error: $e';
@@ -384,12 +386,7 @@ class VoteApiHandler extends ChangeNotifier {
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
-        // Token expired or was replaced by another login
-        SecureStorage secureStorage = SecureStorage();
-        secureStorage.delete("vote_token");
-        isLoggedIn = false;
-        sessionToken = null;
-        lastErrorMessage = 'Session expired. Please log in again.';
+        lastErrorMessage = data['message'] ?? 'Failed to add world (${response.statusCode})';
         notifyListeners();
         return false;
       } else {
@@ -428,16 +425,13 @@ class VoteApiHandler extends ChangeNotifier {
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
-        // Token expired or was replaced by another login
-        SecureStorage secureStorage = SecureStorage();
-        secureStorage.delete("vote_token");
-        isLoggedIn = false;
-        sessionToken = null;
-        lastErrorMessage = 'Session expired. Please log in again.';
+        lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
+        print(data['message']);
         notifyListeners();
         return false;
       } else {
         lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
+        print(data['message']);
         notifyListeners();
         return false;
       }

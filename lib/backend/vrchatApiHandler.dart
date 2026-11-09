@@ -191,7 +191,7 @@ class VrchatApiHandler extends ChangeNotifier{
               currentLocation = response.data;
 
               if (currentLocation != null){
-                aL.voteApi.joinNewWorld(currentLocation!.id);
+                await aL.voteApi.joinNewWorld(currentLocation!.id);
               }
               
 

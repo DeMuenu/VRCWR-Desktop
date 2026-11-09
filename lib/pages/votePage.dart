@@ -28,8 +28,6 @@ class _VotePageState extends State<VotePage> {
 
   Map<int, int> tags = {}; 
 
-  String worldComment = "";
-
 
   @override
   void initState(){
@@ -37,6 +35,13 @@ class _VotePageState extends State<VotePage> {
     vrcApi = widget.vrcApi;
     _lastWorldId = vrcApi.currentLocation?.id;
     vrcApi.addListener(_handleWorldChange);
+  }
+
+  @override
+  void dispose() {
+    vrcApi.removeListener(_handleWorldChange);
+    _commentBoxController.dispose();
+    super.dispose();
   }
 
   void _handleWorldChange() {
@@ -52,7 +57,6 @@ class _VotePageState extends State<VotePage> {
     setState(() {
       generalVoteScore = 0;
       tags.clear();
-      worldComment = "";
     });
   }
 
@@ -125,11 +129,12 @@ class _VotePageState extends State<VotePage> {
                           upVoteIcon: Icons.thumb_up,
                           downVoteIcon: Icons.thumb_down,
                         ),
-                        for (int i = 0; i < (widget.voteApi.currentWorldTags.length) && i < 6; i++) 
+                        for (int i = widget.voteApi.currentWorldTags.length - 1; i >= 0 && i < 10; i--) 
+                          
                           voteContainer(
                             CupertinoIcons.tag, 
-                            widget.voteApi.currentWorldTags[i].tag, 
-                            tags[i] ?? 0,
+                            widget.voteApi.currentWorldTags[i].tag.replaceFirst('author_tag_', '').replaceFirst('vrcwr_tag_', ''), 
+                            tags[widget.voteApi.currentWorldTags[i].id] ?? 0,
                             (score) {setState(() => tags[widget.voteApi.currentWorldTags[i].id] = score);}
                           ),
                           
@@ -154,8 +159,6 @@ class _VotePageState extends State<VotePage> {
                           minLines: 3,
                           maxLines: 5,
                           maxLength: 500,
-                          
-                          onSubmitted: (_) {worldComment = _commentBoxController.text;},
                         ),
                       ),
                     ),
@@ -171,7 +174,15 @@ class _VotePageState extends State<VotePage> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(16),
                           onTap: () {
-                            print("Submit clicked");
+                            widget.voteApi.publishReview(UpstreamWorldVoteInfo(
+                              worldId: widget.voteApi.currentWorld?.worldId ?? "000",
+                              reviewUserName: widget.vrcApi.currentUser?.displayName ?? "Bugged User", 
+                              reviewUserIcon: widget.vrcApi.currentUser!.iconUrl ?? "", 
+                              vote: (generalVoteScore > 0) ? 1 : 0,
+                              comment: _commentBoxController.text,
+                              tags: tags,
+                              ),
+                            );
                           },
                           child: const Padding(
                             padding: EdgeInsets.all(8.0),
