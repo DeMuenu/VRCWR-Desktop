@@ -1,4 +1,6 @@
 
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -24,7 +26,7 @@ class _VotePageState extends State<VotePage> {
 
   int generalVoteScore = 0;
 
-  Map<String, bool> tags = {}; 
+  Map<int, int> tags = {}; 
 
   String worldComment = "";
 
@@ -123,12 +125,12 @@ class _VotePageState extends State<VotePage> {
                           upVoteIcon: Icons.thumb_up,
                           downVoteIcon: Icons.thumb_down,
                         ),
-                        for (int i = 0; i < (widget.voteApi.currentWorldTags.length); i++) 
+                        for (int i = 0; i < (widget.voteApi.currentWorldTags.length) && i < 6; i++) 
                           voteContainer(
                             CupertinoIcons.tag, 
                             widget.voteApi.currentWorldTags[i].tag, 
-                            0, //todo
-                            (score) {setState(() => generalVoteScore = score);}
+                            tags[i] ?? 0,
+                            (score) {setState(() => tags[widget.voteApi.currentWorldTags[i].id] = score);}
                           ),
                           
                       ],

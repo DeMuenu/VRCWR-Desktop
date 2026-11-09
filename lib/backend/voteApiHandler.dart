@@ -86,25 +86,29 @@ class DownstreamWorldVoteInfo {
 class UpstreamWorldVoteInfo {
   final String worldId;
   final String reviewUserName;
+  final String reviewUserIcon;
   final int vote;
-  final List<String>? tags;
   final String? comment;
+  final Map<int, int>? tags;
 
   UpstreamWorldVoteInfo({
     required this.worldId,
     required this.reviewUserName,
+    required this.reviewUserIcon,
     required this.vote,
-    this.tags,
     this.comment,
+    this.tags,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'world_id': worldId,
       'review_usr_name': reviewUserName,
+      'review_usr_icon': reviewUserIcon,
       'review_value': vote,
       if (comment != null && comment!.isNotEmpty) 'review_comment': comment,
-      if (tags != null && tags!.isNotEmpty) 'review_tags': tags,
+      if (tags != null && tags!.isNotEmpty)
+        'review_tags': tags!.map((key, value) => MapEntry(key.toString(), value)),
     };
   }
 }
@@ -157,7 +161,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   String? sessionToken;
   String? lastErrorMessage;
-  bool isLoggedIn = false; //Todo revert
+  bool isLoggedIn = false;
   bool isRegisteredUser = false;
 
   //World bools
@@ -342,7 +346,7 @@ class VoteApiHandler extends ChangeNotifier {
         return true;
       }
       if (response.statusCode == 401) {
-        isRegisteredUser = false; //TODO make better
+        isRegisteredUser = false;
         notifyListeners();
         return true;
       }
@@ -408,10 +412,10 @@ class VoteApiHandler extends ChangeNotifier {
       return false;
     }
 
-    final Uri url = Uri.parse('$_baseUrl/api/world_add_review');
+    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_add');
 
     try {
-      final response = await http.post(
+      final response = await http.put(
         url,
         headers: _authHeaders,
         body: jsonEncode(reviewInfo.toJson()),

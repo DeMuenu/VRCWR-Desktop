@@ -145,6 +145,17 @@ class VrchatApiHandler extends ChangeNotifier{
     return true;
   }
 
+  Future<List<LimitedWorld>> getRecommendations(SortOption sortOption) async {
+    if (!isLoggedIn){
+      print("Not logged in.");
+      return [];
+    }
+
+    final worlds = (await api.rawApi.getWorldsApi().getActiveWorlds(sort: sortOption)).data ?? <LimitedWorld>[];
+
+    return worlds;
+  }
+
   void startRealtimeStream() {
     api.streaming.vrcEventStream.listen((Object event) async {
       switch (event) {

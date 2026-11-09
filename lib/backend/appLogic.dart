@@ -15,6 +15,7 @@ class Applogic extends ChangeNotifier {
   late VrchatApiHandler vrcApi;
   TabSelection get selectedTab => _selectedTab;
 
+
   Applogic(this.voteApi, this.vrcApi);
 
   set selectedTab(TabSelection tab) {
@@ -26,4 +27,9 @@ class Applogic extends ChangeNotifier {
   void isExistingVotingUser(){
     voteApi.userExists(userId: vrcApi.currentUser?.id ?? "000");
   }
+
+  void getWorldRecommendations(){
+
+  }
+
 }
