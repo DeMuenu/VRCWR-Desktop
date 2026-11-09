@@ -16,6 +16,7 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
   final _tokenController = TextEditingController();
   final _emailController = TextEditingController();
   final _votingPasswordController = TextEditingController();
+  final _votingPasswordController2 = TextEditingController();
 
   bool _isLoading = true;
   String? _message;
@@ -32,14 +33,37 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
       _isLoading = true;
       _message = null;
     });
+    if (widget.vrchatApi.currentUser == null){
+      setState(() {
+        _isLoading = true;
+        _message = "VRChat user failed to load";
+      });
+    }
 
     if (!widget.voteApi.isRegisteredUser){
-      if (widget.vrchatApi.currentUser == null){
+
+      final hasUpper = RegExp(r'[A-Z]').hasMatch(_votingPasswordController.text);
+      final hasLower = RegExp(r'[a-z]').hasMatch(_votingPasswordController.text);
+      final hasDigit = RegExp(r'\d').hasMatch(_votingPasswordController.text);
+      final hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(_votingPasswordController.text);
+
+      if(_votingPasswordController2.text != _votingPasswordController.text){
         setState(() {
-          _isLoading = true;
-          _message = "VRChat user failed to load";
+          _isLoading = false;
+          _message = "Password's do not match;";
         });
+        return;
       }
+
+      if(!hasUpper || !hasLower || !hasDigit || !hasSpecial || _votingPasswordController.text.length < 10){
+        setState(() {
+          _isLoading = false;
+          _message = "Your password needs to have 10 digits, a capital letter, a digit and a special character.";
+        });
+        return;
+      }
+
+
       if (await widget.voteApi.createAccount(
         username: widget.vrchatApi.currentUser!.displayName,
         userId: widget.vrchatApi.currentUser!.id,
@@ -101,9 +125,9 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 widget.voteApi.isRegisteredUser == true ? 
-                  Text("A voting account is linked to your VRC account, please enter your voting password:")
+                  Text("A voting account is linked to your VRC account, please enter your VRCWR login credentials:")
                   :
-                  Text("There is no voting account linked to your VRC account, register with your key.\nThe only unencrypted data saved on the voting server is your VRC userId and your VRC username."),
+                  Text("There is no voting account linked to your VRC account, create a VRCWR account with your activation key:"),
                 const SizedBox(height: 16),
                 if (widget.voteApi.isRegisteredUser == false) ...[
                   TextField(
@@ -127,8 +151,15 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
                   decoration: const InputDecoration(labelText: 'Password (not your VRC password)'),
                   obscureText: true,
                   onSubmitted: (_) => _isLoading ? null : _submit(),
-                  autofillHints: const [AutofillHints.password], //TODO check password strenght
                 ),
+                if (widget.voteApi.isRegisteredUser == false) ...[
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _votingPasswordController2,
+                    decoration: const InputDecoration(labelText: 'Repeat password'),
+                    obscureText: true,
+                  ),
+                ],
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _submit,

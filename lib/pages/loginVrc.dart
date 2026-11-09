@@ -88,6 +88,10 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Text("Login to your VRChat account.", textAlign: TextAlign.center, style: TextStyle(fontSize: 40),),
+                const SizedBox(height: 16),
+                Text("Your login information never leaves your device, a cookie is saved locally to sign you in automatically when you open the app next time. If you decide to create a voting account later on; Your VRC user-ID, username and profile picture will be linked it to prevent spam and filter out malicious actors.", textAlign: TextAlign.center, style: TextStyle(fontSize: 40),),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _usernameController,
                   decoration: const InputDecoration(labelText: 'Username'),
