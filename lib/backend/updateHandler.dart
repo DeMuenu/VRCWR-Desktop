@@ -12,9 +12,9 @@ const trustedReleasePublicKeys = <String, String>{
 
 
 String expectedPackageIdForCurrentPlatform() {
-  if (Platform.isMacOS) return "com.demuenu.VRCWR";
+  if (Platform.isMacOS) return "VRCWR";
   if (Platform.isWindows) return "VRCWR";
-  if (Platform.isLinux) return "com.demuenu.VRCWR";
+  if (Platform.isLinux) return "VRCWR";
   throw UnsupportedError("desktop_updater requires a desktop platform.");
 }
 

@@ -3,8 +3,7 @@ updates:
 
 s3:
   bucket: vrcwr-update-container
-  prefix: updates
   region: auto
   endpoint: https://ae76a81c444560d6d4c30cae24c62d00.r2.cloudflarestorage.com
   pathStyle: true
-  profile: desktop-updater-r2
+  exclusivePublicationLease: true

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:desktop_updater/updater_controller.dart';
 import 'package:desktop_updater/widget/update_direct_card.dart';
 import 'package:desktop_updater/widget/update_widget.dart';
@@ -33,7 +35,7 @@ Future<void> main() async {
   final packageInfo = await PackageInfo.fromPlatform();
   HttpOverrides.global = VrchatHttpOverrides(packageInfo.version);
   final updaterController = await createDesktopUpdaterController();
-
+  unawaited(updaterController.checkForUpdates());
   runApp(
     MyApp(
       packageVersion: packageInfo.version,

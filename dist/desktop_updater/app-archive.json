@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 3,
+  "appName": "VRCWR",
+  "items": [
+    {
+      "version": "0.1.0",
+      "buildNumber": 17,
+      "platform": "linux",
+      "channel": "stable",
+      "mandatory": false,
+      "release": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.0/build-17/linux/release.json"
+    },
+    {
+      "version": "0.1.0",
+      "buildNumber": 18,
+      "platform": "linux",
+      "channel": "stable",
+      "mandatory": false,
+      "release": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.0/build-18/linux/release.json"
+    },
+    {
+      "version": "0.1.0",
+      "buildNumber": 19,
+      "platform": "linux",
+      "channel": "stable",
+      "mandatory": false,
+      "release": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.0/build-19/linux/release.json"
+    },
+    {
+      "version": "0.1.0",
+      "buildNumber": 21,
+      "platform": "linux",
+      "channel": "stable",
+      "mandatory": false,
+      "release": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.0/build-21/linux/release.json"
+    },
+    {
+      "version": "0.1.0",
+      "buildNumber": 22,
+      "platform": "linux",
+      "channel": "stable",
+      "mandatory": false,
+      "release": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.0/build-22/linux/release.json"
+    }
+  ],
+  "signature": {
+    "algorithm": "ed25519",
+    "publicKeyId": "release-c83fe439d90fd7a0c2d34a53",
+    "value": "ajU6ap+E3cNErbaLZdogbnlOp2rJ0Xf4/94zPpa0gbb3SKcdAMUPEUkM2MfQ9ViTITl+xl1HGWWkKTDydHaCAA=="
+  }
+}
