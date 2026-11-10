@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "profileId": "39b0cc4198dc7e4eac3ec4ed8f79c049",
+  "feedUrl": "https://vrcwr.lunar-appupdater.download/app-archive.json",
+  "activeKeyId": "release-c83fe439d90fd7a0c2d34a53",
+  "publicKeys": {
+    "release-c83fe439d90fd7a0c2d34a53": "KTUsVXg3y79clnaphb94kMlcgi7sQmGRWz1d83PR3JQ="
+  }
+}

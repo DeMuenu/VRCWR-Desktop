@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vrcworldvoterdesktop/backend/appLogic.dart';
+import 'package:VRCWR/backend/appLogic.dart';
 
 Widget appBar(Applogic aL) {
     return Container(

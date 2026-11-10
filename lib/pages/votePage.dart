@@ -4,8 +4,8 @@ import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
-import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
+import 'package:VRCWR/backend/voteApiHandler.dart';
+import 'package:VRCWR/backend/vrchatApiHandler.dart';
 
 class VotePage extends StatefulWidget {
   final VrchatApiHandler vrcApi;

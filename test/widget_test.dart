@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:vrcworldvoterdesktop/main.dart';
+import 'package:VRCWR/main.dart';
 
 void main() {
   testWidgets('Login form starts without the two-factor field', (

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
-import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
+import 'package:VRCWR/backend/voteApiHandler.dart';
+import 'package:VRCWR/backend/vrchatApiHandler.dart';
 
 class VoteLoginScreen extends StatefulWidget {
   const VoteLoginScreen({super.key, required this.voteApi, required this.vrchatApi});

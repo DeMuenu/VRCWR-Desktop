@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
-import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
+import 'package:VRCWR/backend/voteApiHandler.dart';
+import 'package:VRCWR/backend/vrchatApiHandler.dart';
 
 enum TabSelection{
   worlds,
