@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
 import 'package:vrcworldvoterdesktop/backend/appLogic.dart';
@@ -13,6 +15,8 @@ class VrchatApiHandler extends ChangeNotifier{
 
   late Applogic aL;
 
+  String packageVersion;
+
   bool isLoggedIn = false;
   bool requires2FA = false;
   bool _isInitialized = false;
@@ -21,9 +25,9 @@ class VrchatApiHandler extends ChangeNotifier{
   CurrentUser? currentUser;
 
 
-  static const userAgent = VrchatUserAgent(
+  late VrchatUserAgent userAgent = VrchatUserAgent(
     applicationName: 'VRChatWorldVoterDesktop',
-    version: '0.0.1',
+    version: packageVersion,
     contactInfo: 'appDeveloper@lunarlink.ch',
   );
 
@@ -31,7 +35,9 @@ class VrchatApiHandler extends ChangeNotifier{
     'User-Agent': userAgent.toString(),
   };
 
-  VrchatApiHandler();
+  Map<SortOption, List<LimitedWorld>> cachedRecommendations = {};
+
+  VrchatApiHandler(this.packageVersion);
 
   void setAL(Applogic appLogic){
     aL = appLogic;
@@ -145,15 +151,25 @@ class VrchatApiHandler extends ChangeNotifier{
     return true;
   }
 
-  Future<List<LimitedWorld>> getRecommendations(SortOption sortOption) async {
+  Future<List<LimitedWorld>> getRecommendations(SortOption sortOption, int offset, {tag = null, reqCount = 60}) async {
     if (!isLoggedIn){
       print("Not logged in.");
       return [];
     }
 
-    final worlds = (await api.rawApi.getWorldsApi().getActiveWorlds(sort: sortOption)).data ?? <LimitedWorld>[];
-
-    return worlds;
+    if((cachedRecommendations[sortOption]?.length ?? 0) < offset + reqCount)
+    {
+      offset = max(offset, cachedRecommendations[sortOption]?.length ?? 0);
+      final worlds = (await api.rawApi.getWorldsApi().searchWorlds(sort: sortOption, n: reqCount, offset: offset, tag: tag)).data ?? <LimitedWorld>[];
+      int len = worlds.length;
+      print('Recommendations not cached requesting more. Got: $len');
+      cachedRecommendations[sortOption]?.addAll(worlds);
+      return worlds;
+    }
+    else{
+      return cachedRecommendations[sortOption]!.sublist(offset, (offset + reqCount) as int?);
+    }
+    
   }
 
   void startRealtimeStream() {

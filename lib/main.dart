@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:vrcworldvoterdesktop/backend/appLogic.dart';
 import 'package:vrcworldvoterdesktop/backend/voteApiHandler.dart';
 import 'package:vrcworldvoterdesktop/backend/vrchatApiHandler.dart';
@@ -8,23 +9,33 @@ import 'package:vrcworldvoterdesktop/pages/loginVoting.dart';
 import 'package:vrcworldvoterdesktop/pages/votePage.dart';
 import 'dart:io';
 
+import 'package:vrcworldvoterdesktop/pages/worlds.dart';
+
 class VrchatHttpOverrides extends HttpOverrides {
+  VrchatHttpOverrides(this.appVersion);
+
+  final String appVersion;
+
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..userAgent = 'VRChatWorldVoterDesktop/0.0.1 appDeveloper@lunarlink.ch';
+      ..userAgent =
+          'VRChatWorldVoterDesktop/$appVersion appDeveloper@lunarlink.ch';
   }
 }
 
-void main() {
-  HttpOverrides.global = VrchatHttpOverrides();
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); //Needed for secure storage
-  runApp(MyApp());
+  final packageInfo = await PackageInfo.fromPlatform();
+  HttpOverrides.global = VrchatHttpOverrides(packageInfo.version);
+  runApp(MyApp(packageVersion: packageInfo.version));
 }
 
 class MyApp extends StatefulWidget {
-  final vrchatApi = VrchatApiHandler();
-  
+  MyApp({super.key, required this.packageVersion});
+
+  final String packageVersion;
+  late final vrchatApi = VrchatApiHandler(packageVersion);
   final voteApi = VoteApiHandler();
   late final appLogic = Applogic(voteApi, vrchatApi);
 
@@ -69,7 +80,7 @@ class _MyAppState extends State<MyApp> {
             body: !widget.vrchatApi.isLoggedIn
                 ? VRCLoginScreen(api: widget.vrchatApi)
                 : switch (widget.appLogic.selectedTab) {
-                    TabSelection.worlds => const Text("Worlds"),
+                    TabSelection.worlds => ListViewScreen(widget.vrchatApi),
                     TabSelection.voting => !widget.voteApi.isLoggedIn
                         ? VoteLoginScreen(
                             voteApi: widget.voteApi,

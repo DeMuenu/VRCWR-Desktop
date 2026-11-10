@@ -205,12 +205,12 @@ class VoteApiHandler extends ChangeNotifier {
       );
 
       print(response.statusCode);
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         isRegisteredUser = true;
         notifyListeners();
         return true;
       }
-      if (response.statusCode == 401) {
+      if (response.statusCode == 404) {
         isRegisteredUser = false; //TODO make better
         notifyListeners();
         return true;
@@ -250,7 +250,7 @@ class VoteApiHandler extends ChangeNotifier {
 
       final Map<String, dynamic> data = jsonDecode(response.body);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         sessionToken = data['api_token'];
         SecureStorage secureStorage = SecureStorage();
         secureStorage.write("vote_token", sessionToken ?? "Invalid");
@@ -287,7 +287,7 @@ class VoteApiHandler extends ChangeNotifier {
 
       final Map<String, dynamic> data = jsonDecode(response.body);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         // Replaces any previously stored API token
         sessionToken = data['api_token'];
         SecureStorage secureStorage = SecureStorage();
@@ -344,11 +344,11 @@ class VoteApiHandler extends ChangeNotifier {
       print(worldId);
       print(response.body);
       print(response.statusCode);
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         notifyListeners();
         return true;
       }
-      if (response.statusCode == 401) {
+      if (response.statusCode == 404) {
         notifyListeners();
         return false;
       }
@@ -381,12 +381,16 @@ class VoteApiHandler extends ChangeNotifier {
 
       final Map<String, dynamic> data = jsonDecode(response.body);
       print(response.statusCode);
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         lastErrorMessage = null;
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
         lastErrorMessage = data['message'] ?? 'Failed to add world (${response.statusCode})';
+        notifyListeners();
+        return false;
+      } else if (response.statusCode == 403) {
+        lastErrorMessage = "The world is not public yet and can't be reviewed";
         notifyListeners();
         return false;
       } else {
@@ -420,7 +424,7 @@ class VoteApiHandler extends ChangeNotifier {
 
       final Map<String, dynamic> data = jsonDecode(response.body);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         lastErrorMessage = null;
         notifyListeners();
         return true;
@@ -472,6 +476,43 @@ class VoteApiHandler extends ChangeNotifier {
   // Load world tags
   Future<List<WorldTag>?> loadWorldTags(String worldId) async {
     final Uri url = Uri.parse('$_baseUrl/api/world_tags_get').replace(
+      queryParameters: {'world_id': worldId},
+    );
+
+    try {
+      final response = await http.get(url, headers: _defaultHeaders);
+      final dynamic decoded = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        if (decoded is! List) {
+          lastErrorMessage = 'Unexpected world tags response format.';
+          notifyListeners();
+          return null;
+        }
+
+        lastErrorMessage = null;
+        final worldTags = decoded
+            .map((item) => WorldTag.fromJson(item as Map<String, dynamic>))
+            .toList();
+        return worldTags;
+      } else {
+        final message = decoded is Map && decoded['message'] is String
+            ? decoded['message'] as String
+            : 'Failed to load world tags (${response.statusCode})';
+        lastErrorMessage = message;
+        notifyListeners();
+        return null;
+      }
+    } catch (e) {
+      lastErrorMessage = 'Network error: $e';
+      notifyListeners();
+      return null;
+    }
+  }
+
+  // Load world tags
+  Future<List<WorldTag>?> getMyReview(String worldId) async {
+    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_self_get').replace(
       queryParameters: {'world_id': worldId},
     );
 
