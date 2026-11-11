@@ -7,6 +7,10 @@ hooks:
       platforms:
         - linux
 
+    - command: dart run tool/write_windows_helper_policy.dart build/windows/x64/runner/Release
+      platforms:
+        - windows
+
 s3:
   bucket: vrcwr-update-container
   region: auto

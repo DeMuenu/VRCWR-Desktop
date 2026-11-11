@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
   "baseUrl": "https://vrcwr.lunar-appupdater.download/",
-  "localRoot": "/home/demuenu/Documents/Flutter/VRCWorldVoterDesktop/dist/desktop_updater",
+  "localRoot": "C:\\Users\\hirop\\Documents\\Futter\\VRCWorldVoterDesktop\\dist\\desktop_updater",
   "appArchive": {
     "path": "app-archive.json",
     "url": "https://vrcwr.lunar-appupdater.download/app-archive.json"
   },
   "release": {
     "version": "0.1.2",
-    "buildNumber": 3,
-    "platform": "linux",
+    "buildNumber": 8,
+    "platform": "windows",
     "channel": "stable",
-    "path": "releases/stable/0.1.2/build-3/linux/release.json",
-    "url": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.2/build-3/linux/release.json"
+    "path": "releases/stable/0.1.2/build-8/windows/release.json",
+    "url": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.2/build-8/windows/release.json"
   },
   "artifact": {
-    "path": "releases/stable/0.1.2/build-3/linux/VRCWR-0.1.2-linux.zip",
-    "url": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.2/build-3/linux/VRCWR-0.1.2-linux.zip",
+    "path": "releases/stable/0.1.2/build-8/windows/VRCWR-0.1.2-windows.zip",
+    "url": "https://vrcwr.lunar-appupdater.download/releases/stable/0.1.2/build-8/windows/VRCWR-0.1.2-windows.zip",
     "kind": "zip",
-    "sha256": "2e07ae3b2d95b8625a4ce5ef5970b1454ebfef108b66ccfa87f9c27b174a7d73",
-    "length": 12154972
+    "sha256": "fbc782d6b3bb5029273d8b7ffc38c777efaeeade9a4ac447b16aad9e11cf2826",
+    "length": 14228600
   }
 }
