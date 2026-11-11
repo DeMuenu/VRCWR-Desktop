@@ -1,15 +1,15 @@
 {
   "policyVersion": 1,
-  "policyId": "com.example.vrcworldvoterdesktop.install-policy",
-  "applicationPackageId": "com.example.vrcworldvoterdesktop",
-  "helperServiceId": "com.example.vrcworldvoterdesktop.helper",
+  "policyId": "VRCWR.install-policy",
+  "applicationPackageId": "VRCWR",
+  "helperServiceId": "VRCWR.helper",
   "allowedApplicationSigner": {
     "kind": "appleDesignatedRequirement",
-    "value": "identifier \"com.example.vrcworldvoterdesktop\" and anchor apple generic and certificate leaf[subject.OU] = \"XXXXXXXXXX\""
+    "value": "identifier \"VRCWR\" and anchor apple generic and certificate leaf[subject.OU] = \"XXXXXXXXXX\""
   },
   "allowedHelperSigner": {
     "kind": "appleDesignatedRequirement",
-    "value": "identifier \"com.example.vrcworldvoterdesktop.helper\" and anchor apple generic and certificate leaf[subject.OU] = \"XXXXXXXXXX\""
+    "value": "identifier \"VRCWR.helper\" and anchor apple generic and certificate leaf[subject.OU] = \"XXXXXXXXXX\""
   },
   "allowedTargetClasses": [
     "applicationBundle"

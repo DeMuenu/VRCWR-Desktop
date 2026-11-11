@@ -1,4 +1,4 @@
-# vrcworldvoterdesktop
+# VRCWR
 
 A new Flutter project.
 
