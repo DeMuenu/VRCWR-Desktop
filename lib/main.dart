@@ -66,8 +66,10 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initialize() async {
     await widget.vrchatApi.initVrchatClient();
-    await widget.vrchatApi.cookieLogin();
+    
     widget.vrchatApi.setAL(widget.appLogic);
+
+    await widget.vrchatApi.cookieLogin();
     setState(() {
     });
 
@@ -89,7 +91,9 @@ class _MyAppState extends State<MyApp> {
           appBar: widget.vrchatApi.isLoggedIn
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(kToolbarHeight),
-                  child: appBar(widget.appLogic),
+                  child: Builder(
+                    builder: (context) => appBar(context, widget.appLogic),
+                  ),
                 )
               : null,
           body: Stack(

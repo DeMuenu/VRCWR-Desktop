@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:VRCWR/backend/secureStorage.dart';
@@ -312,6 +313,13 @@ class VoteApiHandler extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  Future<void> logout() async {
+    SecureStorage secureStorage = SecureStorage();
+    secureStorage.delete("vote_token");
+    isLoggedIn = false;
+    exit(0);
   }
 
   Future<bool> joinNewWorld(String worldId) async{

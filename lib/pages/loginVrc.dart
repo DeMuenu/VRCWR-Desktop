@@ -11,7 +11,7 @@ class VRCLoginScreen extends StatefulWidget {
 }
 
 class _VRCLoginScreenState extends State<VRCLoginScreen> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _twoFactorController = TextEditingController();
 
@@ -21,7 +21,7 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _twoFactorController.dispose();
     super.dispose();
@@ -48,7 +48,7 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
         }
       } else {
         final loggedIn = await widget.api.loginToVrchat(
-          _usernameController.text.trim(),
+          _emailController.text.trim(),
           _passwordController.text,
         );
         if (mounted) {
@@ -93,8 +93,8 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
                 Text("Your login information never leaves your device, a cookie is saved locally to sign you in automatically when you open the app next time. If you decide to create a VRCWR account later on; Your VRC user-ID, username and profile picture will be linked it to prevent spam.", textAlign: TextAlign.center, style: TextStyle(fontSize: 15),),
                 const SizedBox(height: 16),
                 TextField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(labelText: 'Username'),
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'E-Mail'),
                   textInputAction: TextInputAction.next,
                   autofillHints: const [AutofillHints.username],
                 ),

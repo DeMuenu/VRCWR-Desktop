@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:VRCWR/backend/appLogic.dart';
 
-Widget appBar(Applogic aL) {
+Widget appBar(BuildContext context, Applogic aL) {
     return Container(
       decoration: BoxDecoration(color: const Color.fromARGB(255, 47, 47, 47)),
       width: 90,
@@ -58,6 +60,54 @@ Widget appBar(Applogic aL) {
             ),
           ),
           Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 50,
+              child: Material(
+                  color: const Color.fromARGB(255, 147, 34, 0),
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                  onTap: () async {
+                    final shouldLogout = await showDialog<bool>(
+                      context: context,
+                      builder: (dialogContext) => AlertDialog(
+                        title: const Text("Log out?"),
+                        content: const Text("Are you sure you want to log out? This will clear your login information, if you don't want to log in again you can just close the app."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(false),
+                            child: const Text("Log Out"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(true),
+                            child: const Text("Just close the app"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (shouldLogout == null) return;
+
+                    if (shouldLogout) {
+                      exit(0);
+                    }
+                    else
+                    {
+                      await aL.vrcApi.logout();
+                      await aL.voteApi.logout();
+                    }
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.logout),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 10,),
         ],),
     );
   }
