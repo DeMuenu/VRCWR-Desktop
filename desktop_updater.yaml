@@ -1,6 +1,12 @@
 updates:
   baseUrl: https://vrcwr.lunar-appupdater.download
 
+hooks:
+  prePackage:
+    - command: dart run tool/write_linux_helper_policy.dart build/linux/x64/release/bundle
+      platforms:
+        - linux
+
 s3:
   bucket: vrcwr-update-container
   region: auto

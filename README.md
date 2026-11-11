@@ -4,14 +4,11 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Download and unpack the zip file. Then go into the folder and **make these two scripts executable with**:
 
-A few resources to get you started if this is your first Flutter project:
+chmod +x VRCWR
+chmod +x lib/desktop-updater-helper
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If a update fails try removing the lock file with:
+rm /home/{your username}/.local/share/com.demuenu.vrcwr/desktop_updater/pending-install-stable.json
