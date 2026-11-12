@@ -68,8 +68,8 @@ Future<void> main(List<String> args) async {
       (keysJson["publicKeys"] as Map<String, dynamic>).entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key));
 
-final packageId = await _resolvePackageId(args);
-  final lowerId = "com.demuenu.${packageId.toLowerCase()}";
+  final packageId = (await _resolvePackageId(args)).toLowerCase();
+  final lowerId = "com.demuenu.$packageId";
 
   // Keys must remain in strict alphabetical order for canonical_json check:
   final policyMap = <String, Object?>{
