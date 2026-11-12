@@ -69,6 +69,7 @@ Future<void> main(List<String> args) async {
         ..sort((a, b) => a.key.compareTo(b.key));
 
   final packageId = await _resolvePackageId(args);
+  final identifierPrefix = "com.demuenu.${packageId.toLowerCase()}";
 
   // Keys must remain in strict alphabetical order for canonical_json check:
   final policyMap = <String, Object?>{
@@ -89,9 +90,9 @@ Future<void> main(List<String> args) async {
     ],
     "allowedTargetClasses": <Object?>["sameUserWritable"],
     "applicationPackageId": packageId,
-    "helperServiceId": "$packageId.helper",
+    "helperServiceId": "$identifierPrefix.helper",
     "minimumHelperProtocolVersion": 1,
-    "policyId": "$packageId.portable",
+    "policyId": "$identifierPrefix.portable",
     "policyVersion": 1,
     "releaseRootPublicKeys": [
       for (final entry in publicKeys)

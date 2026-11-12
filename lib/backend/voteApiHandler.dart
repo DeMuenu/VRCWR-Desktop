@@ -434,6 +434,7 @@ class VoteApiHandler extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         lastErrorMessage = null;
+        print(data['message']);
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
@@ -456,9 +457,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   //4. Load World Data (No Auth Required)
   Future<DownstreamWorldVoteInfo?> loadWorldData(String worldId) async {
-    final Uri url = Uri.parse('$_baseUrl/api/world_get?world_id=$worldId').replace(
-      queryParameters: {'world_id': worldId},
-    );
+    final Uri url = Uri.parse('$_baseUrl/api/world_get?world_id=$worldId');
 
     try {
       final response = await http.get(url, headers: _defaultHeaders);
@@ -483,12 +482,11 @@ class VoteApiHandler extends ChangeNotifier {
 
   // Load world tags
   Future<List<WorldTag>?> loadWorldTags(String worldId) async {
-    final Uri url = Uri.parse('$_baseUrl/api/world_tags_get').replace(
-      queryParameters: {'world_id': worldId},
-    );
+    final Uri url = Uri.parse('$_baseUrl/api/world_tags_get?world_id=$worldId');
 
     try {
       final response = await http.get(url, headers: _defaultHeaders);
+      print(response.body);
       final dynamic decoded = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -502,6 +500,7 @@ class VoteApiHandler extends ChangeNotifier {
         final worldTags = decoded
             .map((item) => WorldTag.fromJson(item as Map<String, dynamic>))
             .toList();
+        print(worldTags.length);
         return worldTags;
       } else {
         final message = decoded is Map && decoded['message'] is String
@@ -520,9 +519,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   // Load world tags
   Future<List<WorldTag>?> getMyReview(String worldId) async {
-    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_self_get').replace(
-      queryParameters: {'world_id': worldId},
-    );
+    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_self_get');
 
     try {
       final response = await http.get(url, headers: _defaultHeaders);
