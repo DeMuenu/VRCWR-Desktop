@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:VRCWR/backend/vrchatApiHandler.dart';
+import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
 class Template extends StatefulWidget {
   final VrchatApiHandler vrcApi;

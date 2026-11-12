@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:VRCWR/backend/appLogic.dart';
+import 'package:vrcwr/backend/appLogic.dart';
 
 Widget appBar(BuildContext context, Applogic aL) {
     return Container(

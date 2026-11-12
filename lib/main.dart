@@ -5,17 +5,17 @@ import 'package:desktop_updater/widget/update_direct_card.dart';
 import 'package:desktop_updater/widget/update_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:VRCWR/backend/updateHandler.dart';
-import 'package:VRCWR/backend/appLogic.dart';
-import 'package:VRCWR/backend/voteApiHandler.dart';
-import 'package:VRCWR/backend/vrchatApiHandler.dart';
-import 'package:VRCWR/pages/appBar.dart';
-import 'package:VRCWR/pages/loginVrc.dart';
-import 'package:VRCWR/pages/loginVoting.dart';
-import 'package:VRCWR/pages/votePage.dart';
+import 'package:vrcwr/backend/updateHandler.dart';
+import 'package:vrcwr/backend/appLogic.dart';
+import 'package:vrcwr/backend/voteApiHandler.dart';
+import 'package:vrcwr/backend/vrchatApiHandler.dart';
+import 'package:vrcwr/pages/appBar.dart';
+import 'package:vrcwr/pages/loginVrc.dart';
+import 'package:vrcwr/pages/loginVoting.dart';
+import 'package:vrcwr/pages/votePage.dart';
 import 'dart:io';
 
-import 'package:VRCWR/pages/worlds.dart';
+import 'package:vrcwr/pages/worlds.dart';
 
 class VrchatHttpOverrides extends HttpOverrides {
   VrchatHttpOverrides(this.appVersion);

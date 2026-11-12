@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
-import 'package:VRCWR/backend/appLogic.dart';
-import 'package:VRCWR/backend/secureStorage.dart';
+import 'package:vrcwr/backend/appLogic.dart';
+import 'package:vrcwr/backend/secureStorage.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:VRCWR/backend/voteApiHandler.dart';
+import 'package:vrcwr/backend/voteApiHandler.dart';
 
 class VrchatApiHandler extends ChangeNotifier{
   late final VrchatDart api;

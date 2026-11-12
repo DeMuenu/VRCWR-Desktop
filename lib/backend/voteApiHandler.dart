@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:VRCWR/backend/secureStorage.dart';
+import 'package:vrcwr/backend/secureStorage.dart';
 
 class DownstreamWorldVoteInfo {
   final int id;

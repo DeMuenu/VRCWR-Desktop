@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:VRCWR/backend/vrchatApiHandler.dart';
+import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
 class VRCLoginScreen extends StatefulWidget {
   const VRCLoginScreen({super.key, required this.api});
