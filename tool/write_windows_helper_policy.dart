@@ -68,8 +68,8 @@ Future<void> main(List<String> args) async {
       (keysJson["publicKeys"] as Map<String, dynamic>).entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key));
 
-  final packageId = await _resolvePackageId(args);
-  final identifierPrefix = "com.demuenu.${packageId.toLowerCase()}";
+final packageId = await _resolvePackageId(args);
+  final lowerId = "com.demuenu.${packageId.toLowerCase()}";
 
   // Keys must remain in strict alphabetical order for canonical_json check:
   final policyMap = <String, Object?>{
@@ -90,9 +90,9 @@ Future<void> main(List<String> args) async {
     ],
     "allowedTargetClasses": <Object?>["sameUserWritable"],
     "applicationPackageId": packageId,
-    "helperServiceId": "$identifierPrefix.helper",
+    "helperServiceId": "$lowerId.helper",
     "minimumHelperProtocolVersion": 1,
-    "policyId": "$identifierPrefix.portable",
+    "policyId": "$lowerId.portable",
     "policyVersion": 1,
     "releaseRootPublicKeys": [
       for (final entry in publicKeys)
@@ -106,25 +106,18 @@ Future<void> main(List<String> args) async {
 
   final canonicalPolicy = jsonEncode(policyMap);
 
-  final targetDirs = <String>{
-    bundleDir.path,
-    helper.parent.path,
-  };
-
   const fileNames = <String>[
-    "desktop_updater_helper_policy.json",
     "desktop_updater_install_helper.policy.json",
+    "desktop_updater_helper_policy.json",
     "desktop-updater-helper.policy.json",
   ];
 
-  for (final dir in targetDirs) {
-    for (final name in fileNames) {
-      final policyFile = File("$dir/$name");
-      await policyFile.writeAsString(canonicalPolicy, flush: true);
-    }
+  for (final name in fileNames) {
+    final policyFile = File("${helper.parent.path}/$name");
+    await policyFile.writeAsString(canonicalPolicy, flush: true);
   }
 
   stdout.writeln(
-    "Wrote canonical Windows helper policy (packageId: $packageId) in ${targetDirs.join(', ')}",
+    "Wrote canonical Windows helper policy (packageId: $packageId) in ${fileNames.join(', ')}",
   );
 }
