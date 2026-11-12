@@ -105,18 +105,25 @@ Future<void> main(List<String> args) async {
 
   final canonicalPolicy = jsonEncode(policyMap);
 
-  // Write the Windows policy filename (underscore) and hyphenated fallback:
-  final windowsPolicyFile = File(
-    "${helper.parent.path}/desktop_updater_helper_policy.json",
-  );
-  await windowsPolicyFile.writeAsString(canonicalPolicy, flush: true);
+  final targetDirs = <String>{
+    bundleDir.path,
+    helper.parent.path,
+  };
 
-  final hyphenPolicyFile = File(
-    "${helper.parent.path}/desktop-updater-helper.policy.json",
-  );
-  await hyphenPolicyFile.writeAsString(canonicalPolicy, flush: true);
+  const fileNames = <String>[
+    "desktop_updater_helper_policy.json",
+    "desktop_updater_install_helper.policy.json",
+    "desktop-updater-helper.policy.json",
+  ];
+
+  for (final dir in targetDirs) {
+    for (final name in fileNames) {
+      final policyFile = File("$dir/$name");
+      await policyFile.writeAsString(canonicalPolicy, flush: true);
+    }
+  }
 
   stdout.writeln(
-    "Wrote canonical Windows helper policy (packageId: $packageId): ${windowsPolicyFile.path}",
+    "Wrote canonical Windows helper policy (packageId: $packageId) in ${targetDirs.join(', ')}",
   );
 }

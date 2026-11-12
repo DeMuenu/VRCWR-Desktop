@@ -7,7 +7,7 @@ hooks:
       platforms:
         - linux
 
-    - command: dart run tool/write_windows_helper_policy.dart build/windows/x64/runner/Release
+    - command: dart run tool/write_windows_helper_policy.dart build/windows/x64/runner/Release VRCWR
       platforms:
         - windows
 
