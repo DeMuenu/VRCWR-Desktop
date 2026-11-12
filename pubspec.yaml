@@ -44,8 +44,7 @@ dependencies:
   http: ^1.6.0
   infinite_scroll_pagination: ^5.1.1
   package_info_plus: ^10.2.2
-  desktop_updater: ^3.2.11
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,11 +1,7 @@
 import 'dart:async';
 
-import 'package:desktop_updater/updater_controller.dart';
-import 'package:desktop_updater/widget/update_direct_card.dart';
-import 'package:desktop_updater/widget/update_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:vrcwr/backend/updateHandler.dart';
 import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
@@ -34,21 +30,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); //Needed for secure storage
   final packageInfo = await PackageInfo.fromPlatform();
   HttpOverrides.global = VrchatHttpOverrides(packageInfo.version);
-  final updaterController = await createDesktopUpdaterController();
-  unawaited(updaterController.checkForUpdates());
+
   runApp(
     MyApp(
       packageVersion: packageInfo.version,
-      updaterController: updaterController,
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({super.key, required this.packageVersion, required this.updaterController,});
+  MyApp({super.key, required this.packageVersion});
 
   final String packageVersion;
-  final DesktopUpdaterController updaterController;
   late final vrchatApi = VrchatApiHandler(packageVersion);
   final voteApi = VoteApiHandler();
   late final appLogic = Applogic(voteApi, vrchatApi);
@@ -82,7 +75,6 @@ class _MyAppState extends State<MyApp> {
       widget.vrchatApi,
       widget.voteApi,
       widget.appLogic,
-      widget.updaterController,
     ]),
       builder: (context, child) {
       return MaterialApp(
@@ -111,17 +103,6 @@ class _MyAppState extends State<MyApp> {
                             : VotePage(widget.vrchatApi, widget.voteApi),
                         TabSelection.worldInfo => const Text("Worldinfo"),
                       },
-              ),
-
-              // 2. Top layer: Floating update card overlaid on top
-              Positioned(
-                top: 16,
-                right: 16,
-                // Optional: Constrain the width so it looks like a floating toast/notification
-                width: 420,
-                child: DesktopUpdateDirectCard(
-                  controller: widget.updaterController,
-                ),
               ),
             ],
           ),
