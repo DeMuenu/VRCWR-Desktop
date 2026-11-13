@@ -626,6 +626,7 @@ class VoteApiHandler extends ChangeNotifier {
         print(decoded);
 
         lastErrorMessage = null;
+
         return decoded
             .map((item) => MyWorldReview.fromJson(
                   Map<String, dynamic>.from(item as Map),

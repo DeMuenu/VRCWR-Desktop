@@ -1,6 +1,8 @@
 
+import 'dart:ffi';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
@@ -73,12 +75,15 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
           FutureBuilder<DownstreamWorldVoteInfo?>(
             future: vA.getCachedWorldVoteInfo(world.id),
             builder: (context, snapshot) {
+              double ratingNum = 50;
               String rating = "";
               if(snapshot.data?.dislikes != null && snapshot.data?.likes != null){
                 if(snapshot.data?.dislikes != null && snapshot.data?.dislikes != 0){
-                  rating = "${(snapshot.data?.likes ?? 0.5) / max(snapshot.data?.dislikes ?? 1, 1) * 100}%";
+                  ratingNum = (snapshot.data?.likes ?? 0.5) / max(snapshot.data?.dislikes ?? 1, 1) * 100;
+                  rating = "$ratingNum%";
                 }
                 else{
+                  ratingNum = 100;
                   rating = "100%";
                 }                
               }
@@ -89,14 +94,22 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
               
               return SafeArea(
                 minimum: const EdgeInsets.all(5),
-                child: Text(
-                  rating,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  textScaler: TextScaler.linear(1.2),
-                  overflow: TextOverflow.fade,
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                ),
+                child: Row(children: [
+                  Spacer(),
+                  if ((snapshot.data?.aiScore ?? 0) > 0) ... [
+                    Icon(CupertinoIcons.flag),
+                  ],
+                  Text(
+                    rating,
+                    style: TextStyle(color: (ratingNum > 50) ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
+                    textScaler: TextScaler.linear(1.2),
+                    overflow: TextOverflow.fade,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                  ),
+                ],)
+                
+                
               );
             },
           ),
