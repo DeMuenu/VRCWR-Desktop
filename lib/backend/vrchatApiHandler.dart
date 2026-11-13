@@ -26,7 +26,7 @@ class VrchatApiHandler extends ChangeNotifier{
 
 
   late VrchatUserAgent userAgent = VrchatUserAgent(
-    applicationName: 'VRChatWorldVoterDesktop',
+    applicationName: 'VRChatWorldRatingDesktop',
     version: packageVersion,
     contactInfo: 'appDeveloper@lunarlink.ch',
   );

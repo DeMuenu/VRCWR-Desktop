@@ -24,16 +24,16 @@ class VrchatHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..userAgent =
-          'VRChatWorldVoterDesktop/$appVersion appDeveloper@lunarlink.ch';
+          'VRChatWorldRatingDesktop/$appVersion appDeveloper@lunarlink.ch';
   }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); //Needed for secure storage
   final packageInfo = await PackageInfo.fromPlatform();
-  HttpOverrides.global = VrchatHttpOverrides(packageInfo.version);
-
   final fullVersion = packageInfo.buildNumber.isNotEmpty ? '${packageInfo.version}+${packageInfo.buildNumber}' : packageInfo.version;
+
+  HttpOverrides.global = VrchatHttpOverrides(fullVersion);
 
   runApp(
     MyApp(

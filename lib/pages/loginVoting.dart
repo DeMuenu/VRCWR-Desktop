@@ -108,6 +108,7 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
   }
 
   Future<void> _initialize() async {
+    widget.vrchatApi.currentUser = widget.vrchatApi.api.auth.currentUser;
     final currentUser = widget.vrchatApi.currentUser;
     if (currentUser == null) {
       if (!mounted) return;
