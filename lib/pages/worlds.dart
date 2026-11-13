@@ -50,70 +50,68 @@ class _ListViewScreenState extends State<ListViewScreen> {
 }
 
 Widget worldItem(LimitedWorld world, VoteApiHandler vA){
-  return FutureBuilder<DownstreamWorldVoteInfo?>(
-    future: vA.getCachedWorldVoteInfo(world.id),
-    builder: (context, snapshot) {
-      
-    final rating = ((snapshot.data?.likes ?? 0.5) / (snapshot.data?.dislikes ?? 1) * 100).toString();
-
-    return ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(16)),
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Image.network(
-            world.thumbnailImageUrl,
-            fit: BoxFit.cover,
+  return ClipRRect(
+    borderRadius: const BorderRadius.all(Radius.circular(16)),
+    child: Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        Image.network(
+          world.thumbnailImageUrl,
+          fit: BoxFit.cover,
+        ),
+        Positioned.fill(
+          child: Container(
+            color: const Color.fromARGB(80, 0, 0, 0)
           ),
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.3,
-              child: Container(
-                color: const Color(0xFF000000),
-              ),
+        ),
+        Align(
+          alignment: Alignment.topRight,
+          child: 
+          FutureBuilder<DownstreamWorldVoteInfo?>(
+            future: vA.getCachedWorldVoteInfo(world.id),
+            builder: (context, snapshot) {
+              final rating = ((snapshot.data?.likes ?? 0.5) / (snapshot.data?.dislikes ?? 1) * 100).toString();
+              return SafeArea(
+                minimum: const EdgeInsets.all(5),
+                child: Text(
+                  "$rating%",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  textScaler: TextScaler.linear(1.2),
+                  overflow: TextOverflow.fade,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
+          ),
+          
+          
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SafeArea(
+            minimum: const EdgeInsets.all(5),
+            child: Text(
+              world.name,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              textScaler: TextScaler.linear(1.2),
+              overflow: TextOverflow.fade,
+              maxLines: 2,
+              textAlign: TextAlign.center,
             ),
           ),
-          Align(
-            alignment: Alignment.topRight,
-            child: SafeArea(
-              minimum: const EdgeInsets.all(5),
-              child: Text(
-                "$rating%",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                textScaler: TextScaler.linear(1.2),
-                overflow: TextOverflow.fade,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-              ),
+        ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                print('Tapped on ${world.name}');
+              },
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              minimum: const EdgeInsets.all(5),
-              child: Text(
-                world.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                textScaler: TextScaler.linear(1.2),
-                overflow: TextOverflow.fade,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  print('Tapped on ${world.name}');
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-    },
+        ),
+      ],
+    ),
   );
 }

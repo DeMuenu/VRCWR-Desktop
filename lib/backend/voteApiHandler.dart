@@ -549,13 +549,13 @@ class VoteApiHandler extends ChangeNotifier {
         lastErrorMessage = null;
         return DownstreamWorldVoteInfo.fromJson(data);
       } else {
-        lastErrorMessage = data['message'] ?? 'Failed to load world (${response.statusCode})';
-        notifyListeners();
+        // lastErrorMessage = data['message'] ?? 'Failed to load world (${response.statusCode})';
+        // notifyListeners();
         return null;
       }
     } catch (e) {
-      lastErrorMessage = 'Network error: $e';
-      notifyListeners();
+      // lastErrorMessage = 'Network error: $e';
+      // notifyListeners();
       return null;
     }
   }
