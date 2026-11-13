@@ -2,12 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
+import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
 
 class ListViewScreen extends StatefulWidget {
   final VrchatApiHandler vrcApi;
-  const ListViewScreen(this.vrcApi, {super.key});
+  final VoteApiHandler voteApi;
+  const ListViewScreen(this.vrcApi, this.voteApi, {super.key});
 
   @override
   State<ListViewScreen> createState() => _ListViewScreenState();
@@ -41,51 +43,77 @@ class _ListViewScreenState extends State<ListViewScreen> {
         childAspectRatio: 4 / 3, // Width-to-height ratio of each grid item
       ),
       builderDelegate: PagedChildBuilderDelegate(
-        itemBuilder: (context, item, index) => worldItem(item),
+        itemBuilder: (context, item, index) => worldItem(item, widget.voteApi),
       )
     ),
   );
 }
 
-Widget worldItem(LimitedWorld world){
-    return Container(
-      color: Colors.transparent,
-      child:
-        ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(16)),
-          child: 
-            Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                Image.network(
-                  world.thumbnailImageUrl,
-                  fit: BoxFit.cover,
-                ),
-                Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.3,
-                    child: Container(
-                      color: const Color(0xFF000000),
-                    ),
-                  ),
-                ),
-                
-                Center(child: Text(world.name, style: TextStyle(fontWeight: FontWeight.bold), textScaler: TextScaler.linear(1.5), overflow: TextOverflow.fade, maxLines: 3, textAlign: TextAlign.center,),),
-              
-                Positioned.fill(
-                
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      // Handle tap here
-                      print('Tapped on ${world.name}');
-                    },
-                  ),
-                ),
+Widget worldItem(LimitedWorld world, VoteApiHandler vA){
+  return FutureBuilder<DownstreamWorldVoteInfo?>(
+    future: vA.getCachedWorldVoteInfo(world.id),
+    builder: (context, snapshot) {
+      
+    final rating = ((snapshot.data?.likes ?? 0) / (snapshot.data?.dislikes ?? 1) * 100).toString();
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(16)),
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Image.network(
+            world.thumbnailImageUrl,
+            fit: BoxFit.cover,
+          ),
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.3,
+              child: Container(
+                color: const Color(0xFF000000),
               ),
-              ],
-            )
-        )
+            ),
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: SafeArea(
+              minimum: const EdgeInsets.all(5),
+              child: Text(
+                "$rating%",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                textScaler: TextScaler.linear(1.2),
+                overflow: TextOverflow.fade,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              minimum: const EdgeInsets.all(5),
+              child: Text(
+                world.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                textScaler: TextScaler.linear(1.2),
+                overflow: TextOverflow.fade,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  print('Tapped on ${world.name}');
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
-  }
+    },
+  );
+}

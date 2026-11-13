@@ -242,6 +242,8 @@ class VoteApiHandler extends ChangeNotifier {
   MyWorldReview? currentWorldReview;
   bool worldExistsOnServer = false;
 
+  Map<String, DownstreamWorldVoteInfo> cachedWorldRatings = {};
+
   Map<String, String> get _defaultHeaders => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -397,6 +399,21 @@ class VoteApiHandler extends ChangeNotifier {
       await updateCurrentWorld();
     }
     return true;
+  }
+
+
+  Future<DownstreamWorldVoteInfo?> getCachedWorldVoteInfo(String worldId) async{
+    if (cachedWorldRatings.containsKey(worldId)){
+      return cachedWorldRatings[worldId];
+    }
+    else{
+      DownstreamWorldVoteInfo? newWorld = await loadWorldData(worldId);
+      if (newWorld != null){
+        cachedWorldRatings[worldId] = newWorld;
+        return newWorld;
+      }
+    }
+    return null;
   }
 
 
