@@ -33,9 +33,11 @@ Future<void> main() async {
   final packageInfo = await PackageInfo.fromPlatform();
   HttpOverrides.global = VrchatHttpOverrides(packageInfo.version);
 
+  final fullVersion = packageInfo.buildNumber.isNotEmpty ? '${packageInfo.version}+${packageInfo.buildNumber}' : packageInfo.version;
+
   runApp(
     MyApp(
-      packageVersion: packageInfo.version,
+      packageVersion: fullVersion,
     ),
   );
 }
@@ -141,15 +143,40 @@ class _MyAppState extends State<MyApp> {
                           }
                         },
 
-                        getBinaryUrl: (latestVersion) async {
-                          if (Platform.isWindows) {
-                            return "https://vrcwr.lunar-appupdater.download/win/VRChatWorldRatingDesktop-x86_64-$latestVersion-Installer.exe";
-                          } else if (Platform.isLinux) {
-                            return "https://github.com/latest/release/bin-linux"; //TODO add linux link
-                          } 
-                          throw UnsupportedError('Unsupported platform');
-                        },
-                        appName: "VRCWR",
+                    getBinaryUrl: (latestVersion) async {
+                      if (Platform.isWindows) {
+                        return "https://vrcwr.lunar-appupdater.download/win/VRChatWorldRatingDesktop-x86_64-$latestVersion-Installer.exe";
+                      } else if (Platform.isLinux) {
+                        return "https://github.com/latest/release/bin-linux"; //TODO add linux link
+                      } 
+                      throw UnsupportedError('Unsupported platform');
+                    },
+
+                    getChangelog: (latestVersion, appVersion) async {
+                      final client = HttpClient();
+                      try {
+                        String changelogLoc = "https://vrcwr.lunar-appupdater.download/changelog.json";
+
+                        final request = await client.getUrl(
+                          Uri.parse(changelogLoc),
+                        );
+                        final response = await request.close();
+                        final body = await response.transform(utf8.decoder).join();
+
+                        if (response.statusCode != HttpStatus.ok) {
+                          throw HttpException(
+                            'Could not fetch latest version: HTTP ${response.statusCode}',
+                          );
+                        }
+
+                        final json = jsonDecode(body) as Map<String, dynamic>;
+                        return json['text'] as String;
+                      } finally {
+                        client.close();
+                      }
+                    },
+                    
+                    appName: "VRCWR",
                       ),
                     ),
               ),
