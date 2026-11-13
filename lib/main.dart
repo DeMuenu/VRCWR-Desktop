@@ -11,6 +11,7 @@ import 'package:vrcwr/pages/loginVrc.dart';
 import 'package:vrcwr/pages/loginVoting.dart';
 import 'package:vrcwr/pages/votePage.dart';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:vrcwr/pages/worlds.dart';
 
@@ -105,25 +106,52 @@ class _MyAppState extends State<MyApp> {
                         TabSelection.worldInfo => const Text("Worldinfo"),
                       },
               ),
-              UpdatWidget(
-                currentVersion: widget.packageVersion,
-                getLatestVersion: () async {
-                  // Here you should fetch the latest version. It must be semantic versioning for update detection to work properly.
-                  return "1.0.1";
-                },
-                getBinaryUrl: (latestVersion) async {
-                  // Here you provide the link to the binary the user should download. Make sure it is the correct one for the platform!
-                  if (Platform.isWindows) {
-                    return "https://vrcwr.lunar-appupdater.download/vrcwr.msix";
-                  } else if (Platform.isLinux) {
-                    return "https://github.com/latest/release/bin-linux";
-                  } else if (Platform.isMacOS) {
-                    return "https://github.com/latest/release/bin-macos";
-                  }
-                  throw UnsupportedError('Unsupported platform');
-                },
-                // Lastly, enter your app name so we know what to call your files.
-                appName: "VRCWR",
+              Align(
+                alignment: Alignment.bottomRight,
+                child: SafeArea(
+                  minimum: const EdgeInsets.all(16),
+                  child: UpdatWidget(
+                    currentVersion: widget.packageVersion,
+                    getLatestVersion: () async {
+                      final client = HttpClient();
+                      try {
+                        String releaseLoc = "";
+                        if (Platform.isWindows) {
+                          releaseLoc = "https://vrcwr.lunar-appupdater.download/winVersion.json";
+                        } else if (Platform.isLinux) {
+                          releaseLoc = "https://vrcwr.lunar-appupdater.download/winVersion.json"; //TODO add linux link
+                        }
+
+                        final request = await client.getUrl(
+                          Uri.parse(releaseLoc),
+                        );
+                        final response = await request.close();
+                        final body = await response.transform(utf8.decoder).join();
+
+                        if (response.statusCode != HttpStatus.ok) {
+                          throw HttpException(
+                            'Could not fetch latest version: HTTP ${response.statusCode}',
+                          );
+                        }
+
+                        final json = jsonDecode(body) as Map<String, dynamic>;
+                        return json['version'] as String;
+                          } finally {
+                            client.close();
+                          }
+                        },
+
+                        getBinaryUrl: (latestVersion) async {
+                          if (Platform.isWindows) {
+                            return "https://vrcwr.lunar-appupdater.download/win/VRChatWorldRatingDesktop-x86_64-$latestVersion-Installer.exe";
+                          } else if (Platform.isLinux) {
+                            return "https://github.com/latest/release/bin-linux"; //TODO add linux link
+                          } 
+                          throw UnsupportedError('Unsupported platform');
+                        },
+                        appName: "VRCWR",
+                      ),
+                    ),
               ),
             ],
           ),

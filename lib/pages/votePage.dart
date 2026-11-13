@@ -178,7 +178,7 @@ class _VotePageState extends State<VotePage> {
                               worldId: widget.voteApi.currentWorld?.worldId ?? "000",
                               reviewUserName: widget.vrcApi.currentUser?.displayName ?? "Bugged User", 
                               reviewUserIcon: widget.vrcApi.currentUser!.iconUrl ?? "", 
-                              vote: (generalVoteScore > 0) ? 1 : 0,
+                              vote: generalVoteScore,
                               comment: _commentBoxController.text,
                               tags: tags,
                               ),

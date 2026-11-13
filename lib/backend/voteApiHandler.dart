@@ -159,6 +159,69 @@ class WorldTag {
       };
 }
 
+class ReviewTagVote {
+  final int id;
+  final int value;
+
+  const ReviewTagVote({required this.id, required this.value});
+
+  factory ReviewTagVote.fromJson(Map<String, dynamic> json) {
+    return ReviewTagVote(
+      id: json['id'] as int? ?? 0,
+      value: json['value'] as int? ?? 0,
+    );
+  }
+}
+
+class MyWorldReview {
+  final int id;
+  final String worldId;
+  final String userId;
+  final int like;
+  final List<ReviewTagVote> tags;
+  final String? comment;
+  final int ai;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const MyWorldReview({
+    required this.id,
+    required this.worldId,
+    required this.userId,
+    required this.like,
+    required this.tags,
+    required this.comment,
+    required this.ai,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory MyWorldReview.fromJson(Map<String, dynamic> json) {
+    final epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    final rawTags = json['tags'];
+
+    return MyWorldReview(
+      id: json['id'] as int? ?? 0,
+      worldId: json['world_id'] as String? ?? '',
+      userId: json['user_id'] as String? ?? '',
+      like: json['like'] as int? ?? 0,
+      tags: rawTags is List
+          ? rawTags
+              .map((item) => ReviewTagVote.fromJson(
+                    Map<String, dynamic>.from(item as Map),
+                  ))
+              .toList()
+          : const [],
+      comment: json['comment'] as String?,
+      ai: json['ai'] as int? ?? 0,
+      createdAt:
+          DateTime.tryParse(json['created_at'] as String? ?? '') ?? epoch,
+      updatedAt:
+          DateTime.tryParse(json['updated_at'] as String? ?? '') ?? epoch,
+    );
+  }
+}
+
 class VoteApiHandler extends ChangeNotifier {
   static const String _baseUrl = 'https://vrcwr.kokos-labs.at';
 
@@ -328,6 +391,8 @@ class VoteApiHandler extends ChangeNotifier {
     print(worldExistsOnServer);
     if (worldExistsOnServer){
       await updateCurrentWorld();
+
+      getMyReview(worldId);
     }
     return true;
   }
@@ -517,34 +582,36 @@ class VoteApiHandler extends ChangeNotifier {
     }
   }
 
-  // Load world tags
-  Future<List<WorldTag>?> getMyReview(String worldId) async {
-    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_self_get');
+  Future<List<MyWorldReview>?> getMyReview(String worldId) async {
+    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_self_get')
+        .replace(queryParameters: {'world_id': worldId});
 
     try {
-      final response = await http.get(url, headers: _defaultHeaders);
+      final response = await http.get(url, headers: _authHeaders);
       final dynamic decoded = jsonDecode(response.body);
+
+      print(response.body);
 
       if (response.statusCode == 200) {
         if (decoded is! List) {
-          lastErrorMessage = 'Unexpected world tags response format.';
+          lastErrorMessage = 'Unexpected world reviews response format.';
           notifyListeners();
           return null;
         }
 
         lastErrorMessage = null;
-        final worldTags = decoded
-            .map((item) => WorldTag.fromJson(item as Map<String, dynamic>))
+        return decoded
+            .map((item) => MyWorldReview.fromJson(
+                  Map<String, dynamic>.from(item as Map),
+                ))
             .toList();
-        return worldTags;
-      } else {
-        final message = decoded is Map && decoded['message'] is String
-            ? decoded['message'] as String
-            : 'Failed to load world tags (${response.statusCode})';
-        lastErrorMessage = message;
-        notifyListeners();
-        return null;
       }
+
+      lastErrorMessage = decoded is Map && decoded['message'] is String
+          ? decoded['message'] as String
+          : 'Failed to load world reviews (${response.statusCode})';
+      notifyListeners();
+      return null;
     } catch (e) {
       lastErrorMessage = 'Network error: $e';
       notifyListeners();
