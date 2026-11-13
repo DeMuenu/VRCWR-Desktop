@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
@@ -60,8 +62,9 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
           fit: BoxFit.cover,
         ),
         Positioned.fill(
+          
           child: Container(
-            color: const Color.fromARGB(80, 0, 0, 0)
+            color: const Color.fromARGB(156, 0, 0, 0)
           ),
         ),
         Align(
@@ -70,11 +73,24 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
           FutureBuilder<DownstreamWorldVoteInfo?>(
             future: vA.getCachedWorldVoteInfo(world.id),
             builder: (context, snapshot) {
-              final rating = ((snapshot.data?.likes ?? 0.5) / (snapshot.data?.dislikes ?? 1) * 100).toString();
+              String rating = "";
+              if(snapshot.data?.dislikes != null && snapshot.data?.likes != null){
+                if(snapshot.data?.dislikes != null && snapshot.data?.dislikes != 0){
+                  rating = "${(snapshot.data?.likes ?? 0.5) / max(snapshot.data?.dislikes ?? 1, 1) * 100}%";
+                }
+                else{
+                  rating = "100%";
+                }                
+              }
+              else{
+                return Text("");
+              }
+
+              
               return SafeArea(
                 minimum: const EdgeInsets.all(5),
                 child: Text(
-                  "$rating%",
+                  rating,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   textScaler: TextScaler.linear(1.2),
                   overflow: TextOverflow.fade,

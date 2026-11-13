@@ -113,7 +113,7 @@ class UpstreamWorldVoteInfo {
       if (comment != null && comment!.isNotEmpty) 'review_comment': comment,
       if (tags != null && tags!.isNotEmpty)
         'review_tags': tags!.entries
-          .map((entry) => {'id': entry.key, 'value': entry.value})
+          .map((entry) => {'tag_id': entry.key, 'vote': entry.value})
             .toList(),
     };
   }
@@ -241,6 +241,7 @@ class VoteApiHandler extends ChangeNotifier {
   List<WorldTag> currentWorldTags = [];
   MyWorldReview? currentWorldReview;
   bool worldExistsOnServer = false;
+  bool hasOwnExistingReview = false;
 
   Map<String, DownstreamWorldVoteInfo?> cachedWorldRatings = {};
 
@@ -420,6 +421,12 @@ class VoteApiHandler extends ChangeNotifier {
     worldExistsOnServer = currentWorld != null;
     currentWorldTags = await loadWorldTags(currentWorldId) ?? [];
     currentWorldReview = await getMyReview(currentWorldId);
+    if (currentWorldReview != null) {
+      hasOwnExistingReview = true;
+    } else {
+      hasOwnExistingReview = false;
+    }
+    notifyListeners();
     print(currentWorld);
     print(currentWorld?.authorName ?? "");
     return currentWorld != null;
@@ -626,13 +633,35 @@ class VoteApiHandler extends ChangeNotifier {
             .toList()[0];
       }
 
-      lastErrorMessage = decoded is Map && decoded['message'] is String
+      final errorMessage = decoded is Map && decoded['message'] is String
           ? decoded['message'] as String
+          : '';
+      final errorId = decoded is Map ? decoded['err_id'] : null;
+      if (response.statusCode == 401 ||
+          errorId == 'ERR_INVALID_TOKEN' ||
+          errorMessage.toLowerCase().contains('unauthenticated')) {
+        lastErrorMessage = 'You must be logged in to view your review.';
+        isLoggedIn = false;
+        sessionToken = null;
+        await SecureStorage().delete('vote_token');
+        notifyListeners();
+        return null;
+      }
+
+      lastErrorMessage = errorMessage.isNotEmpty
+          ? errorMessage
           : 'Failed to load world reviews (${response.statusCode})';
       notifyListeners();
       return null;
     } catch (e) {
-      lastErrorMessage = 'Network error: $e';
+      if (e.toString().contains('Unauthenticated')) {
+        lastErrorMessage = 'You must be logged in to view your review.';
+        isLoggedIn = false;
+        sessionToken = null;
+        await SecureStorage().delete('vote_token');
+      } else {
+        lastErrorMessage = 'Network error: $e';
+      }
       notifyListeners();
       return null;
     }

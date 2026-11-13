@@ -180,38 +180,85 @@ class _VotePageState extends State<VotePage> {
                     ),
                   ),
                   SizedBox(height: 30,),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 120,
-                      child: Material(
-                          color: Color.fromARGB(255, 66, 66, 66),
-                          borderRadius: BorderRadius.circular(16),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            widget.voteApi.publishReview(UpstreamWorldVoteInfo(
-                              worldId: widget.voteApi.currentWorld?.worldId ?? "000",
-                              userId: widget.vrcApi.currentUser?.id ?? "000",
-                              reviewUserName: widget.vrcApi.currentUser?.displayName ?? "Bugged User", 
-                              reviewUserIcon: widget.vrcApi.currentUser!.iconUrl ?? "", 
-                              vote: generalVoteScore,
-                              comment: _commentBoxController.text,
-                              tags: tags,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(child: 
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: 120,
+                            child: Material(
+                                color: Color.fromARGB(255, 66, 66, 66),
+                                borderRadius: BorderRadius.circular(16),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                onTap: () async{
+                                  bool published = await widget.voteApi.publishReview(UpstreamWorldVoteInfo(
+                                    worldId: widget.voteApi.currentWorld?.worldId ?? "000",
+                                    userId: widget.vrcApi.currentUser?.id ?? "000",
+                                    reviewUserName: widget.vrcApi.currentUser?.displayName ?? "Bugged User", 
+                                    reviewUserIcon: widget.vrcApi.currentUser!.iconUrl ?? "", 
+                                    vote: generalVoteScore,
+                                    comment: _commentBoxController.text,
+                                    tags: tags,
+                                    ),
+                                  );
+
+                                  if (published) {
+                                    String action = widget.voteApi.hasOwnExistingReview ? "updated" : "published";
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Your review has been $action!')),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Failed to publish your review: ${widget.voteApi.lastErrorMessage}')),
+                                    );
+                                  }
+
+                                  widget.voteApi.hasOwnExistingReview = published;
+
+                                  setState(() {});
+
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(!widget.voteApi.hasOwnExistingReview ? "Submit" : "Update Review", textAlign: TextAlign.center),
+                                ),
                               ),
-                            );
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("Submit", textAlign: TextAlign.center),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                ]
+                      if (widget.voteApi.hasOwnExistingReview) ...([
+                        Expanded(child: 
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: 120,
+                              child: Material(
+                                  color: Color.fromARGB(255, 66, 66, 66),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                  onTap: () async{
+                                    print("See other reviews");
+                                    setState(() {});
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text("See other's reviews", textAlign: TextAlign.center),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                    ]
+                    )
+                ]),
+                ])
 
-                )
                 else 
                   Padding(
                     padding: const EdgeInsets.all(8.0),
