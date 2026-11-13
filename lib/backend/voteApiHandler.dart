@@ -86,6 +86,7 @@ class DownstreamWorldVoteInfo {
 
 class UpstreamWorldVoteInfo {
   final String worldId;
+  final String userId;
   final String reviewUserName;
   final String reviewUserIcon;
   final int vote;
@@ -94,6 +95,7 @@ class UpstreamWorldVoteInfo {
 
   UpstreamWorldVoteInfo({
     required this.worldId,
+    required this.userId,
     required this.reviewUserName,
     required this.reviewUserIcon,
     required this.vote,
@@ -104,6 +106,7 @@ class UpstreamWorldVoteInfo {
   Map<String, dynamic> toJson() {
     return {
       'world_id': worldId,
+      'user_id' : userId,
       'review_usr_name': reviewUserName,
       'review_usr_icon': reviewUserIcon,
       'review_value': vote,
@@ -499,17 +502,17 @@ class VoteApiHandler extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         lastErrorMessage = null;
-        print(data['message']);
+        print("Response: $data['message']");
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
         lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
-        print(data['message']);
+        print("Response: $data['message']");
         notifyListeners();
         return false;
       } else {
         lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
-        print(data['message']);
+        print("Response: $data['message']");
         notifyListeners();
         return false;
       }
@@ -598,6 +601,8 @@ class VoteApiHandler extends ChangeNotifier {
           notifyListeners();
           return null;
         }
+
+        print(decoded);
 
         lastErrorMessage = null;
         return decoded

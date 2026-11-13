@@ -192,6 +192,7 @@ class _VotePageState extends State<VotePage> {
                           onTap: () {
                             widget.voteApi.publishReview(UpstreamWorldVoteInfo(
                               worldId: widget.voteApi.currentWorld?.worldId ?? "000",
+                              userId: widget.vrcApi.currentUser?.id ?? "000",
                               reviewUserName: widget.vrcApi.currentUser?.displayName ?? "Bugged User", 
                               reviewUserIcon: widget.vrcApi.currentUser!.iconUrl ?? "", 
                               vote: generalVoteScore,
