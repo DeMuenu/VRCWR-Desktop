@@ -54,7 +54,7 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
     future: vA.getCachedWorldVoteInfo(world.id),
     builder: (context, snapshot) {
       
-    final rating = ((snapshot.data?.likes ?? 0) / (snapshot.data?.dislikes ?? 1) * 100).toString();
+    final rating = ((snapshot.data?.likes ?? 0.5) / (snapshot.data?.dislikes ?? 1) * 100).toString();
 
     return ClipRRect(
       borderRadius: const BorderRadius.all(Radius.circular(16)),
