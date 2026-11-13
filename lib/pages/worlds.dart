@@ -41,46 +41,51 @@ class _ListViewScreenState extends State<ListViewScreen> {
         childAspectRatio: 4 / 3, // Width-to-height ratio of each grid item
       ),
       builderDelegate: PagedChildBuilderDelegate(
-        itemBuilder: (context, item, index) => WorldItem(item),
+        itemBuilder: (context, item, index) => worldItem(item),
       )
     ),
   );
 }
 
-Widget WorldItem(LimitedWorld world){
+Widget worldItem(LimitedWorld world){
     return Container(
+      color: Colors.transparent,
+      child:
+        ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          child: 
+            Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                Image.network(
+                  world.thumbnailImageUrl,
+                  fit: BoxFit.cover,
+                ),
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.3,
+                    child: Container(
+                      color: const Color(0xFF000000),
+                    ),
+                  ),
+                ),
+                
+                Center(child: Text(world.name, style: TextStyle(fontWeight: FontWeight.bold), textScaler: TextScaler.linear(1.5), overflow: TextOverflow.fade, maxLines: 3, textAlign: TextAlign.center,),),
+              
+                Positioned.fill(
+                
+                child: Material(
                   color: Colors.transparent,
-                  child:
-                    ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(16)),
-                      child: 
-                        Stack(
-                          fit: StackFit.expand,
-                          children: <Widget>[
-                            Image.network(world.thumbnailImageUrl),
-                            Positioned.fill(
-                              child: Opacity(
-                                opacity: 0.5,
-                                child: Container(
-                                  color: const Color(0xFF000000),
-                                ),
-                              ),
-                            ),
-                            Center(child: Text(world.name, style: TextStyle(fontWeight: FontWeight.bold), textScaler: TextScaler.linear(1.5), overflow: TextOverflow.fade, maxLines: 3, textAlign: TextAlign.center,),),
-                          
-                            Positioned.fill(
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  // Handle tap here
-                                  print('Tapped on ${world.name}');
-                                },
-                              ),
-                            ),
-                          ),
-                          ],
-                        )
-                    )
-                );
+                  child: InkWell(
+                    onTap: () {
+                      // Handle tap here
+                      print('Tapped on ${world.name}');
+                    },
+                  ),
+                ),
+              ),
+              ],
+            )
+        )
+    );
   }

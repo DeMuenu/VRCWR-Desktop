@@ -236,6 +236,7 @@ class VoteApiHandler extends ChangeNotifier {
     'world_id': '000',
   });
   List<WorldTag> currentWorldTags = [];
+  MyWorldReview? currentWorldReview;
   bool worldExistsOnServer = false;
 
   Map<String, String> get _defaultHeaders => {
@@ -391,8 +392,6 @@ class VoteApiHandler extends ChangeNotifier {
     print(worldExistsOnServer);
     if (worldExistsOnServer){
       await updateCurrentWorld();
-
-      getMyReview(worldId);
     }
     return true;
   }
@@ -403,6 +402,7 @@ class VoteApiHandler extends ChangeNotifier {
     currentWorld = await loadWorldData(currentWorldId);
     worldExistsOnServer = currentWorld != null;
     currentWorldTags = await loadWorldTags(currentWorldId) ?? [];
+    currentWorldReview = await getMyReview(currentWorldId);
     print(currentWorld);
     print(currentWorld?.authorName ?? "");
     return currentWorld != null;
@@ -582,7 +582,7 @@ class VoteApiHandler extends ChangeNotifier {
     }
   }
 
-  Future<List<MyWorldReview>?> getMyReview(String worldId) async {
+  Future<MyWorldReview?> getMyReview(String worldId) async {
     final Uri url = Uri.parse('$_baseUrl/api/world_reviews_self_get')
         .replace(queryParameters: {'world_id': worldId});
 
@@ -604,7 +604,7 @@ class VoteApiHandler extends ChangeNotifier {
             .map((item) => MyWorldReview.fromJson(
                   Map<String, dynamic>.from(item as Map),
                 ))
-            .toList();
+            .toList()[0];
       }
 
       lastErrorMessage = decoded is Map && decoded['message'] is String

@@ -50,6 +50,22 @@ class _VotePageState extends State<VotePage> {
 
     _lastWorldId = worldId;
     resetFields();
+
+    if (widget.voteApi.currentWorldReview != null){
+      List<WorldTag> worldTags = widget.voteApi.currentWorldTags;
+      MyWorldReview userReview = widget.voteApi.currentWorldReview!;
+      _commentBoxController.text = userReview.comment ?? "";
+
+      for (ReviewTagVote singleTag in userReview.tags) {
+        if (worldTags.any((worldTag) => worldTag.id == singleTag.id)) {
+          tags[singleTag.id] = singleTag.value;
+        }
+      }
+
+      generalVoteScore = userReview.like;
+
+    }
+
   }
 
   void resetFields() {
