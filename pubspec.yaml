@@ -56,7 +56,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  msix: ^3.18.0
+  inno_bundle: ^0.12.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -101,9 +101,7 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 
-msix_config:
-  display_name: VRChat World Rating Desktop
-  publisher_display_name: DeMuenu
-  identity_name: com.demuenu.vrcwr
-  msix_version: 1.0.0.0
-  capabilities: internetClient
+inno_bundle:
+  id: b494a3f0-def5-11f1-82c3-bdd79da1b98f
+  name: "VRChat World Rating Desktop"
+  publisher: "DeMuenu"

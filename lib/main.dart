@@ -106,17 +106,24 @@ class _MyAppState extends State<MyApp> {
                       },
               ),
               UpdatWidget(
-                currentVersion: "1.0.0",
+                currentVersion: widget.packageVersion,
                 getLatestVersion: () async {
                   // Here you should fetch the latest version. It must be semantic versioning for update detection to work properly.
                   return "1.0.1";
                 },
                 getBinaryUrl: (latestVersion) async {
                   // Here you provide the link to the binary the user should download. Make sure it is the correct one for the platform!
-                  return "https://github.com/latest/release/bin.exe";
+                  if (Platform.isWindows) {
+                    return "https://vrcwr.lunar-appupdater.download/vrcwr.msix";
+                  } else if (Platform.isLinux) {
+                    return "https://github.com/latest/release/bin-linux";
+                  } else if (Platform.isMacOS) {
+                    return "https://github.com/latest/release/bin-macos";
+                  }
+                  throw UnsupportedError('Unsupported platform');
                 },
                 // Lastly, enter your app name so we know what to call your files.
-                appName: "Updat Example",
+                appName: "VRCWR",
               ),
             ],
           ),
