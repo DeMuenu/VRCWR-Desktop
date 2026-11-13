@@ -1,6 +1,3 @@
-
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -21,60 +18,24 @@ class VotePage extends StatefulWidget {
 
 class _VotePageState extends State<VotePage> {
   late VrchatApiHandler vrcApi;
-  String? _lastWorldId;
-  final _commentBoxController = TextEditingController();
 
-  int generalVoteScore = 0;
-
-  Map<int, int> tags = {}; 
 
 
   @override
   void initState(){
     super.initState();
     vrcApi = widget.vrcApi;
-    _lastWorldId = vrcApi.currentLocation?.id;
-    vrcApi.addListener(_handleWorldChange);
+    widget.voteApi.lastWorldId = vrcApi.currentLocation?.id;
   }
 
   @override
   void dispose() {
-    vrcApi.removeListener(_handleWorldChange);
-    _commentBoxController.dispose();
     super.dispose();
   }
 
-  void _handleWorldChange() {
-    final worldId = vrcApi.currentLocation?.id;
-    if (worldId == null || worldId == _lastWorldId) return;
 
-    _lastWorldId = worldId;
-    resetFields();
 
-    if (widget.voteApi.currentWorldReview != null){
-      List<WorldTag> worldTags = widget.voteApi.currentWorldTags;
-      MyWorldReview userReview = widget.voteApi.currentWorldReview!;
-      _commentBoxController.text = userReview.comment ?? "";
 
-      for (ReviewTagVote singleTag in userReview.tags) {
-        if (worldTags.any((worldTag) => worldTag.id == singleTag.id)) {
-          tags[singleTag.id] = singleTag.value;
-        }
-      }
-
-      generalVoteScore = userReview.like;
-
-    }
-
-  }
-
-  void resetFields() {
-    _commentBoxController.clear();
-    setState(() {
-      generalVoteScore = 0;
-      tags.clear();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,8 +101,8 @@ class _VotePageState extends State<VotePage> {
                         voteContainer(
                           Icons.how_to_vote,
                           "Like",
-                          generalVoteScore,
-                          (int score) { setState(() => generalVoteScore = score); },
+                          widget.voteApi.generalVoteScore,
+                          (int score) { setState(() => widget.voteApi.generalVoteScore = score); },
                           upVoteIcon: Icons.thumb_up,
                           downVoteIcon: Icons.thumb_down,
                         ),
@@ -150,8 +111,8 @@ class _VotePageState extends State<VotePage> {
                           voteContainer(
                             CupertinoIcons.tag, 
                             widget.voteApi.currentWorldTags[i].tag.replaceFirst('author_tag_', '').replaceFirst('vrcwr_tag_', ''), 
-                            tags[widget.voteApi.currentWorldTags[i].id] ?? 0,
-                            (score) {setState(() => tags[widget.voteApi.currentWorldTags[i].id] = score);}
+                            widget.voteApi.uiTags[widget.voteApi.currentWorldTags[i].id] ?? 0,
+                            (score) {setState(() => widget.voteApi.uiTags[widget.voteApi.currentWorldTags[i].id] = score);}
                           ),
                           
                       ],
@@ -164,7 +125,7 @@ class _VotePageState extends State<VotePage> {
                       decoration: BoxDecoration(color: Color.fromARGB(255, 66, 66, 66), borderRadius: BorderRadius.circular(12)),
                       child: Padding(padding: const .symmetric(horizontal: 16),
                       child: TextField(
-                          controller: _commentBoxController,
+                          controller: widget.voteApi.commentBoxController,
                           decoration: const InputDecoration(
                             labelText: 'Leave a PUBLIC comment, your username will be shown. (optional)',
                             labelStyle: TextStyle(color: Colors.white),
@@ -199,9 +160,9 @@ class _VotePageState extends State<VotePage> {
                                     userId: widget.vrcApi.currentUser?.id ?? "000",
                                     reviewUserName: widget.vrcApi.currentUser?.displayName ?? "Bugged User", 
                                     reviewUserIcon: widget.vrcApi.currentUser!.iconUrl ?? "", 
-                                    vote: generalVoteScore,
-                                    comment: _commentBoxController.text,
-                                    tags: tags,
+                                    vote: widget.voteApi.generalVoteScore,
+                                    comment: widget.voteApi.commentBoxController.text,
+                                    tags: widget.voteApi.uiTags,
                                     ),
                                   );
 

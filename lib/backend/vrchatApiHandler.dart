@@ -89,6 +89,12 @@ class VrchatApiHandler extends ChangeNotifier{
     isLoggedIn = true;
     requires2FA = false;
 
+    await getCurrentWorld();
+
+    notifyListeners();
+  }
+  
+  Future<void> getCurrentWorld() async{
     //Grab users current location so they don't have to respawn
     final locationResponse = await api.rawApi.getUsersApi().getUser(userId: currentUser!.id);
     final location = locationResponse.data?.location;
@@ -103,8 +109,6 @@ class VrchatApiHandler extends ChangeNotifier{
     if (currentLocation != null){
       await aL.voteApi.joinNewWorld(currentLocation!.id);
     }
-
-    notifyListeners();
   }
 
   Future<bool> loginToVrchat(String username, String password) async {
@@ -134,20 +138,7 @@ class VrchatApiHandler extends ChangeNotifier{
       startRealtimeStream();
       isLoggedIn = true;
 
-      //Grab users current location so they don't have to respawn
-      final locationResponse = await api.rawApi.getUsersApi().getUser(userId: currentUser!.id);
-      final location = locationResponse.data?.location;
-      if (location != null && location.isNotEmpty) {
-        final worldId = location.split(':').first;
-        if (worldId.startsWith('wrld_')) {
-          final worldResponse = await api.rawApi.getWorldsApi().getWorld(worldId: worldId);
-          currentLocation = worldResponse.data;
-        }
-      }
-
-      if (currentLocation != null){
-        await aL.voteApi.joinNewWorld(currentLocation!.id);
-      }
+      await getCurrentWorld();
 
       notifyListeners();
     }
@@ -178,6 +169,10 @@ class VrchatApiHandler extends ChangeNotifier{
       startRealtimeStream();
       isLoggedIn = true;
       requires2FA = false;
+
+      await getCurrentWorld();
+
+
       notifyListeners();
     }
     return true;

@@ -47,7 +47,7 @@ class MyApp extends StatefulWidget {
 
   final String packageVersion;
   late final vrchatApi = VrchatApiHandler(packageVersion);
-  final voteApi = VoteApiHandler();
+  late final voteApi = VoteApiHandler(vrchatApi);
   late final appLogic = Applogic(voteApi, vrchatApi);
 
   @override

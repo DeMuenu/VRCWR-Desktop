@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:vrcwr/backend/secureStorage.dart';
+import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
 class DownstreamWorldVoteInfo {
   final int id;
@@ -170,8 +171,8 @@ class ReviewTagVote {
 
   factory ReviewTagVote.fromJson(Map<String, dynamic> json) {
     return ReviewTagVote(
-      id: json['id'] as int? ?? 0,
-      value: json['value'] as int? ?? 0,
+      id: json['tag_id'] as int? ?? 0,
+      value: json['vote'] as int? ?? 0,
     );
   }
 }
@@ -227,6 +228,11 @@ class MyWorldReview {
 
 class VoteApiHandler extends ChangeNotifier {
   static const String _baseUrl = 'https://vrcwr.kokos-labs.at';
+  final VrchatApiHandler vrcApi;
+
+  VoteApiHandler(this.vrcApi) {
+    initVoting();
+  }
 
   String? sessionToken;
   String? lastErrorMessage;
@@ -245,6 +251,52 @@ class VoteApiHandler extends ChangeNotifier {
 
   Map<String, DownstreamWorldVoteInfo?> cachedWorldRatings = {};
 
+
+  //Vote page persistent storage:
+  String? lastWorldId;
+  final commentBoxController = TextEditingController();
+
+  int generalVoteScore = 0;
+
+  Map<int, int> uiTags = {}; 
+
+
+  void resetFields() {
+    commentBoxController.clear();
+
+    generalVoteScore = 0;
+    uiTags.clear();
+
+    notifyListeners();
+
+  }
+
+  void handleWorldChange() {
+    final worldId = vrcApi.currentLocation?.id;
+    if (worldId == null || worldId == lastWorldId) return;
+
+    lastWorldId = worldId;
+    resetFields();
+
+    if (currentWorldReview != null){
+      List<WorldTag> worldTags = currentWorldTags;
+      MyWorldReview userReview = currentWorldReview!;
+      commentBoxController.text = userReview.comment ?? "";
+
+      for (ReviewTagVote singleTag in userReview.tags) {
+        if (worldTags.any((worldTag) => worldTag.id == singleTag.id)) {
+          uiTags[singleTag.id] = singleTag.value;
+        }
+      }
+
+      generalVoteScore = userReview.like;
+
+    }
+
+  }
+
+
+
   Map<String, String> get _defaultHeaders => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -255,9 +307,6 @@ class VoteApiHandler extends ChangeNotifier {
         if (sessionToken != null) 'Authorization': 'Bearer $sessionToken',
       };
 
-  VoteApiHandler() {
-    initVoting();
-  }
 
   Future<void> initVoting() async {
     final secureStorage = SecureStorage();
@@ -398,7 +447,9 @@ class VoteApiHandler extends ChangeNotifier {
     print(worldExistsOnServer);
     if (worldExistsOnServer){
       await updateCurrentWorld();
+      handleWorldChange();
     }
+    notifyListeners();
     return true;
   }
 
