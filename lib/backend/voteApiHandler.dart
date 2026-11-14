@@ -615,7 +615,7 @@ class UpstreamWorldVoteInfo {
       'review_usr_name': reviewUserName,
       'review_usr_icon': reviewUserIcon,
       'review_value': vote,
-      if (comment != null && comment!.isNotEmpty) 'review_comment': comment,
+      'review_comment': comment,
       if (tags != null && tags!.isNotEmpty)
         'review_tags': tags!.entries
           .where((entry) => entry.value != 0)
