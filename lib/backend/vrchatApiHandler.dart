@@ -9,6 +9,8 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 
 class VrchatApiHandler extends ChangeNotifier{
+
+  ////Important variables START
   late final VrchatDart api;
 
   late var authResponse;
@@ -23,8 +25,12 @@ class VrchatApiHandler extends ChangeNotifier{
 
   World? currentLocation;
   CurrentUser? currentUser;
+  ////Important variables END
 
 
+
+
+  ///Helper functions START
   late VrchatUserAgent userAgent = VrchatUserAgent(
     applicationName: 'VRChatWorldRatingDesktop',
     version: packageVersion,
@@ -63,6 +69,13 @@ class VrchatApiHandler extends ChangeNotifier{
     interceptors.removeWhere((i) => i is CookieManager);
     interceptors.add(CookieManager(secureCookieJar));
   }
+
+  ///Helper functions END
+
+
+
+
+//////////////////////////////////////////// API calls ////////////////////////////////////////////
 
   Future<void> cookieLogin() async {
     final (loginSuccess, loginError) = await api.auth.login();
