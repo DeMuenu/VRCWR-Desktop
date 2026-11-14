@@ -56,6 +56,7 @@ class VoteApiHandler extends ChangeNotifier {
     generalVoteScore = 0;
     uiTags.clear();
 
+
     notifyListeners();
 
   }
@@ -235,7 +236,17 @@ class VoteApiHandler extends ChangeNotifier {
 
   Future<bool> joinNewWorld(String worldId) async{
     currentWorldId = worldId;
+    currentWorld = DownstreamWorldVoteInfo.fromJson({
+      'world_id': '000',
+    });
+    currentWorldTags = [];
+    currentWorldReview = null;
+    hasOwnExistingReview = false;
+
+    resetFields();
+
     worldExistsOnServer = await worldExist(worldId = worldId);
+
    //print(worldExistsOnServer);
     if (worldExistsOnServer){
       await updateCurrentWorld();
@@ -356,6 +367,8 @@ class VoteApiHandler extends ChangeNotifier {
         headers: _authHeaders,
         body: jsonEncode(reviewInfo.toJson()),
       );
+
+      print(reviewInfo.toJson());
 
       final Map<String, dynamic> data = jsonDecode(response.body);
 
