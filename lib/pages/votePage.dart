@@ -25,7 +25,6 @@ class _VotePageState extends State<VotePage> {
   void initState(){
     super.initState();
     vrcApi = widget.vrcApi;
-    widget.voteApi.lastWorldId = vrcApi.currentLocation?.id;
   }
 
   @override

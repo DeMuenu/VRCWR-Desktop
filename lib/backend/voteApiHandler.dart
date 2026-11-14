@@ -202,7 +202,7 @@ class MyWorldReview {
 
   factory MyWorldReview.fromJson(Map<String, dynamic> json) {
     final epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
-    final rawTags = json['tags'];
+    final rawTags = json['tag_reviews'];
 
     return MyWorldReview(
       id: json['id'] as int? ?? 0,

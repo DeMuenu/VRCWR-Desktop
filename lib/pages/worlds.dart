@@ -10,16 +10,16 @@ import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
 
-class ListViewScreen extends StatefulWidget {
+class RecommendationScreen extends StatefulWidget {
   final VrchatApiHandler vrcApi;
   final VoteApiHandler voteApi;
-  const ListViewScreen(this.vrcApi, this.voteApi, {super.key});
+  const RecommendationScreen(this.vrcApi, this.voteApi, {super.key});
 
   @override
-  State<ListViewScreen> createState() => _ListViewScreenState();
+  State<RecommendationScreen> createState() => _RecommendationScreenState();
 }
 
-class _ListViewScreenState extends State<ListViewScreen> {
+class _RecommendationScreenState extends State<RecommendationScreen> {
   final int pageSize = 60;
   SortOption sortOption = SortOption.hotness;
   String worldTag = 'system_published_recently';
@@ -35,22 +35,22 @@ class _ListViewScreenState extends State<ListViewScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => PagingListener(
-    controller: _pagingController,
-    builder: (context, state, fetchNextPage) => PagedGridView<int, LimitedWorld>(
-      state: state,
-      fetchNextPage: fetchNextPage,
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 300, // Maximum width of each world card in pixels
-        mainAxisSpacing: 16,     // Vertical spacing between rows
-        crossAxisSpacing: 16,    // Horizontal spacing between columns
-        childAspectRatio: 4 / 3, // Width-to-height ratio of each grid item
+  Widget build(BuildContext context) => Padding(padding: EdgeInsetsGeometry.all(8), child:  PagingListener(
+      controller: _pagingController,
+      builder: (context, state, fetchNextPage) => PagedGridView<int, LimitedWorld>(
+        state: state,
+        fetchNextPage: fetchNextPage,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300, // Maximum width of each world card in pixels
+          mainAxisSpacing: 16,     // Vertical spacing between rows
+          crossAxisSpacing: 16,    // Horizontal spacing between columns
+          childAspectRatio: 4 / 3, // Width-to-height ratio of each grid item
+        ),
+        builderDelegate: PagedChildBuilderDelegate(
+          itemBuilder: (context, item, index) => worldItem(item, widget.voteApi),
+        )
       ),
-      builderDelegate: PagedChildBuilderDelegate(
-        itemBuilder: (context, item, index) => worldItem(item, widget.voteApi),
-      )
-    ),
-  );
+    ),);
 }
 
 Widget worldItem(LimitedWorld world, VoteApiHandler vA){

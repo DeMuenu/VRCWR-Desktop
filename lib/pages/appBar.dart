@@ -46,6 +46,29 @@ Widget appBar(BuildContext context, Applogic aL) {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
                   onTap: () {
+                    aL.selectedTab = TabSelection.worldInfo;
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("Info", textAlign: TextAlign.center),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(width: 10,),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 120,
+              child: Material(
+                  color: Colors.blueGrey,
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                  onTap: () {
                     aL.selectedTab = TabSelection.voting;
                     if(!aL.voteApi.isLoggedIn){
                       aL.isExistingVotingUser();

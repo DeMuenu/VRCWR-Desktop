@@ -7,6 +7,7 @@ import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 import 'package:vrcwr/pages/appBar.dart';
+import 'package:vrcwr/pages/infoPage.dart';
 import 'package:vrcwr/pages/loginVrc.dart';
 import 'package:vrcwr/pages/loginVoting.dart';
 import 'package:vrcwr/pages/votePage.dart';
@@ -98,14 +99,14 @@ class _MyAppState extends State<MyApp> {
                 child: !widget.vrchatApi.isLoggedIn
                     ? VRCLoginScreen(api: widget.vrchatApi)
                     : switch (widget.appLogic.selectedTab) {
-                        TabSelection.worlds => ListViewScreen(widget.vrchatApi, widget.voteApi),
+                        TabSelection.worlds => RecommendationScreen(widget.vrchatApi, widget.voteApi),
                         TabSelection.voting => !widget.voteApi.isLoggedIn
                             ? VoteLoginScreen(
                                 voteApi: widget.voteApi,
                                 vrchatApi: widget.vrchatApi,
                               )
                             : VotePage(widget.vrchatApi, widget.voteApi),
-                        TabSelection.worldInfo => const Text("Worldinfo"),
+                        TabSelection.worldInfo => InfoPage(widget.vrchatApi, widget.voteApi),
                       },
               ),
               Align(
