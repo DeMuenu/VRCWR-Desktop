@@ -6,7 +6,7 @@ The code is only "source available", not open source. You are not allowed to int
 
 This repository is only public for transparency, since the user enters their VRChat credentials into the application. If you want to see the important parts for that interaction, check [vrchatApiHandler.dart](https://github.com/DeMuenu/VRCWR-Desktop/blob/main/lib/backend/vrchatApiHandler.dart) and how other parts of the software interact with it.
 
-There is a downloadable version at [Releases](https://github.com/DeMuenu/MoonlightVRC/releases) but you are free to build the application yourself.
+There is a downloadable version at [Releases](https://github.com/DeMuenu/VRCWR-Desktop/releases) but you are free to build the application yourself.
 
 ## Account
 
