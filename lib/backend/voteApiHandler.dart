@@ -451,7 +451,7 @@ class VoteApiHandler extends ChangeNotifier {
       print(response.body);
 
       if (response.statusCode == 200) {
-        if (decoded is! List) {
+        if (decoded is! Map) {
           lastErrorMessage = 'Unexpected world reviews response format.';
           notifyListeners();
           return null;
@@ -461,11 +461,7 @@ class VoteApiHandler extends ChangeNotifier {
 
         lastErrorMessage = null;
 
-        return decoded
-            .map((item) => MyWorldReview.fromJson(
-                  Map<String, dynamic>.from(item as Map),
-                ))
-            .toList()[0];
+        return MyWorldReview.fromJson(Map<String, dynamic>.from(decoded));
       }
 
       final errorMessage = decoded is Map && decoded['message'] is String
