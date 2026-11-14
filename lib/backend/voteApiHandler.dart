@@ -618,6 +618,7 @@ class UpstreamWorldVoteInfo {
       if (comment != null && comment!.isNotEmpty) 'review_comment': comment,
       if (tags != null && tags!.isNotEmpty)
         'review_tags': tags!.entries
+          .where((entry) => entry.value != 0)
           .map((entry) => {'tag_id': entry.key, 'vote': entry.value})
             .toList(),
     };
