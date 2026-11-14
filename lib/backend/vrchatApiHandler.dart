@@ -97,7 +97,7 @@ class VrchatApiHandler extends ChangeNotifier{
       return;
     }
 
-    print('Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})');
+   //print('Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})');
     startRealtimeStream();
     isLoggedIn = true;
     requires2FA = false;
@@ -131,7 +131,7 @@ class VrchatApiHandler extends ChangeNotifier{
     );
 
     if (loginError != null) {
-      print('Login failed: ${loginError.error}');
+     //print('Login failed: ${loginError.error}');
       return false;
     }
 
@@ -145,7 +145,7 @@ class VrchatApiHandler extends ChangeNotifier{
 
     currentUser = api.auth.currentUser;
     if (currentUser != null) {
-      print(
+     //print(
         'Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})',
       );
       startRealtimeStream();
@@ -162,21 +162,21 @@ class VrchatApiHandler extends ChangeNotifier{
     if (authResponse.twoFactorAuthTypes.contains(TwoFactorAuthType.emailOtp)) {
       final (_, twoFactorError) = await api.auth.verify2fa(TFACode);
       if (twoFactorError != null) {
-        print('Email 2FA failed: ${twoFactorError.error}');
+       //print('Email 2FA failed: ${twoFactorError.error}');
         return false;
       }
     } else {
       // TOTP / Authenticator App 2FA:
       final (_, twoFactorError) = await api.auth.verify2fa(TFACode);
       if (twoFactorError != null) {
-        print('TOTP 2FA failed: ${twoFactorError.error}');
+       //print('TOTP 2FA failed: ${twoFactorError.error}');
         return false;
       }
     }
 
     final currentUser = api.auth.currentUser;
     if (currentUser != null) {
-      print(
+     //print(
         'Successfully logged in as: ${currentUser.displayName} (${currentUser.id})',
       );
       startRealtimeStream();
@@ -193,7 +193,7 @@ class VrchatApiHandler extends ChangeNotifier{
 
   Future<List<LimitedWorld>> getRecommendations(SortOption sortOption, int offset, {tag = null, reqCount = 60}) async {
     if (!isLoggedIn){
-      print("Not logged in.");
+     //print("Not logged in.");
       return [];
     }
 
@@ -202,7 +202,7 @@ class VrchatApiHandler extends ChangeNotifier{
       offset = max(offset, cachedRecommendations[sortOption]?.length ?? 0);
       final worlds = (await api.rawApi.getWorldsApi().searchWorlds(sort: sortOption, n: reqCount, offset: offset, tag: tag)).data ?? <LimitedWorld>[];
       int len = worlds.length;
-      print('Recommendations not cached requesting more. Got: $len');
+     //print('Recommendations not cached requesting more. Got: $len');
       cachedRecommendations.putIfAbsent(sortOption, () => <LimitedWorld>[]).addAll(worlds);
       return worlds;
     }
@@ -227,27 +227,27 @@ class VrchatApiHandler extends ChangeNotifier{
       switch (event) {
         case WebsocketFriendOnline():
           // Has: userId, location, platform, canRequestInvite
-          print('Friend came online: ${event.userId} (Location: ${event.location})');
+         //print('Friend came online: ${event.userId} (Location: ${event.location})');
           break;
 
         case WebsocketFriendOffline():
           // Has: userId, platform
-          print('Friend went offline: ${event.userId}');
+         //print('Friend went offline: ${event.userId}');
           break;
 
         case WebsocketFriendLocation():
           // Has: user, userId, location, travelingToLocation, worldId, canRequestInvite
-          print('${event.user.displayName} moved to world ID: ${event.worldId} (${event.location})');
+         //print('${event.user.displayName} moved to world ID: ${event.worldId} (${event.location})');
           break;
 
         case WebsocketFriendUpdate():
           // Has: user, userId
-          print('${event.user.displayName} updated their profile');
+         //print('${event.user.displayName} updated their profile');
           break;
 
         case WebsocketUserLocation():
           // Has: user, userId, location, instance, travelingToLocation
-          print('Current user (${event.user.displayName}) moved to ${event.location}');
+         //print('Current user (${event.user.displayName}) moved to ${event.location}');
           
           final worldId = event.location.split(':').first;
 
@@ -263,7 +263,7 @@ class VrchatApiHandler extends ChangeNotifier{
 
 
             } catch (e) {
-              print('Failed to fetch world $worldId: $e');
+             //print('Failed to fetch world $worldId: $e');
               currentLocation = null;
             }
           }
@@ -273,14 +273,14 @@ class VrchatApiHandler extends ChangeNotifier{
 
         case VrcStreamingError():
           // Has: message
-          print('WebSocket pipeline error: ${event.message}');
+         //print('WebSocket pipeline error: ${event.message}');
           break;
 
         default:
-          print('Received event (${event.runtimeType}): $event');
+         //print('Received event (${event.runtimeType}): $event');
       }
     });
-    print('Listening to Websocket...');
+   //print('Listening to Websocket...');
     api.streaming.start();
   }
 }

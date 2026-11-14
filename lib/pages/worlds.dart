@@ -135,7 +135,7 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                print('Tapped on ${world.name}');
+               //print('Tapped on ${world.name}');
               },
             ),
           ),

@@ -210,7 +210,7 @@ class _VotePageState extends State<VotePage> {
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(16),
                                   onTap: () async{
-                                    print("See other reviews");
+                                   //print("See other reviews");
                                     setState(() {});
                                   },
                                   child: const Padding(

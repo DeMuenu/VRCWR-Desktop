@@ -98,7 +98,7 @@ class VoteApiHandler extends ChangeNotifier {
   Future<void> initVoting() async {
     final secureStorage = SecureStorage();
     sessionToken = await secureStorage.read("vote_token");
-    print(sessionToken);
+   //print(sessionToken);
     isLoggedIn = sessionToken != null && sessionToken!.isNotEmpty;
     notifyListeners();
   }
@@ -118,7 +118,7 @@ class VoteApiHandler extends ChangeNotifier {
         url,
       );
 
-      print(response.statusCode);
+     //print(response.statusCode);
       if (response.statusCode == 200) {
         isRegisteredUser = true;
         notifyListeners();
@@ -236,7 +236,7 @@ class VoteApiHandler extends ChangeNotifier {
   Future<bool> joinNewWorld(String worldId) async{
     currentWorldId = worldId;
     worldExistsOnServer = await worldExist(worldId = worldId);
-    print(worldExistsOnServer);
+   //print(worldExistsOnServer);
     if (worldExistsOnServer){
       await updateCurrentWorld();
       handleWorldChange();
@@ -267,8 +267,8 @@ class VoteApiHandler extends ChangeNotifier {
       hasOwnExistingReview = false;
     }
     notifyListeners();
-    print(currentWorld);
-    print(currentWorld?.authorName ?? "");
+   //print(currentWorld);
+   //print(currentWorld?.authorName ?? "");
     return currentWorld != null;
   }
 
@@ -278,9 +278,9 @@ class VoteApiHandler extends ChangeNotifier {
       final response = await http.get(
         url,
       );
-      print(worldId);
-      print(response.body);
-      print(response.statusCode);
+     //print(worldId);
+     //print(response.body);
+     //print(response.statusCode);
       if (response.statusCode == 200) {
         notifyListeners();
         return true;
@@ -316,7 +316,7 @@ class VoteApiHandler extends ChangeNotifier {
       );
 
       final Map<String, dynamic> data = jsonDecode(response.body);
-      print(response.statusCode);
+     //print(response.statusCode);
       if (response.statusCode == 200) {
         lastErrorMessage = null;
         notifyListeners();
@@ -361,17 +361,17 @@ class VoteApiHandler extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         lastErrorMessage = null;
-        print("Response: $data['message']");
+       //print("Response: $data['message']");
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
         lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
-        print("Response: $data['message']");
+       //print("Response: $data['message']");
         notifyListeners();
         return false;
       } else {
         lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
-        print("Response: $data['message']");
+       //print("Response: $data['message']");
         notifyListeners();
         return false;
       }
@@ -409,7 +409,7 @@ class VoteApiHandler extends ChangeNotifier {
 
     try {
       final response = await http.get(url, headers: _defaultHeaders);
-      print(response.body);
+     //print(response.body);
       final dynamic decoded = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -423,7 +423,7 @@ class VoteApiHandler extends ChangeNotifier {
         final worldTags = decoded
             .map((item) => WorldTag.fromJson(item as Map<String, dynamic>))
             .toList();
-        print(worldTags.length);
+       //print(worldTags.length);
         return worldTags;
       } else {
         final message = decoded is Map && decoded['message'] is String
@@ -448,7 +448,7 @@ class VoteApiHandler extends ChangeNotifier {
       final response = await http.get(url, headers: _authHeaders);
       final dynamic decoded = jsonDecode(response.body);
 
-      print(response.body);
+     //print(response.body);
 
       if (response.statusCode == 200) {
         if (decoded is! Map) {
@@ -457,7 +457,7 @@ class VoteApiHandler extends ChangeNotifier {
           return null;
         }
 
-        print(decoded);
+       //print(decoded);
 
         lastErrorMessage = null;
 
