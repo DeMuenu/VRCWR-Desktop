@@ -145,9 +145,9 @@ class VrchatApiHandler extends ChangeNotifier{
 
     currentUser = api.auth.currentUser;
     if (currentUser != null) {
-     //print(
-        'Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})',
-      );
+      //print(
+      //  'Successfully logged in as: ${currentUser!.displayName} (${currentUser!.id})',
+      //);
       startRealtimeStream();
       isLoggedIn = true;
 
@@ -177,8 +177,8 @@ class VrchatApiHandler extends ChangeNotifier{
     final currentUser = api.auth.currentUser;
     if (currentUser != null) {
      //print(
-        'Successfully logged in as: ${currentUser.displayName} (${currentUser.id})',
-      );
+      //  'Successfully logged in as: ${currentUser.displayName} (${currentUser.id})',
+      //);
       startRealtimeStream();
       isLoggedIn = true;
       requires2FA = false;
