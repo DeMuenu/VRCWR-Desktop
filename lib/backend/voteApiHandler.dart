@@ -256,8 +256,8 @@ class VoteApiHandler extends ChangeNotifier {
     return true;
   }
 
-  Future<DownstreamWorldVoteInfo?> getCachedWorldVoteInfo(String worldId) async{
-    if (cachedWorldRatings.containsKey(worldId)){
+  Future<DownstreamWorldVoteInfo?> getCachedWorldVoteInfo(String worldId, {bool forceRefresh = false}) async{
+    if (cachedWorldRatings.containsKey(worldId) && forceRefresh == false){
       return cachedWorldRatings[worldId];
     }
     else{

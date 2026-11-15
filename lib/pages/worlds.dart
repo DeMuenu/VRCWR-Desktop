@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
+import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
@@ -13,7 +14,8 @@ import 'package:vrcwr/backend/vrchatApiHandler.dart';
 class RecommendationScreen extends StatefulWidget {
   final VrchatApiHandler vrcApi;
   final VoteApiHandler voteApi;
-  const RecommendationScreen(this.vrcApi, this.voteApi, {super.key});
+  final Applogic aL;
+  const RecommendationScreen(this.vrcApi, this.voteApi, this.aL,{super.key});
 
   @override
   State<RecommendationScreen> createState() => _RecommendationScreenState();
@@ -47,13 +49,13 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
           childAspectRatio: 4 / 3, // Width-to-height ratio of each grid item
         ),
         builderDelegate: PagedChildBuilderDelegate(
-          itemBuilder: (context, item, index) => worldItem(item, widget.voteApi),
+          itemBuilder: (context, item, index) => worldItem(item, widget.voteApi, widget.aL),
         )
       ),
     ),);
 }
 
-Widget worldItem(LimitedWorld world, VoteApiHandler vA){
+Widget worldItem(LimitedWorld world, VoteApiHandler vA, Applogic aL){
   return ClipRRect(
     borderRadius: const BorderRadius.all(Radius.circular(16)),
     child: Stack(
@@ -134,8 +136,9 @@ Widget worldItem(LimitedWorld world, VoteApiHandler vA){
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {
-               //print('Tapped on ${world.name}');
+              onTap: () async {
+                await aL.setSelectedWorld(world.id);
+                aL.selectedTab =TabSelection.worldInfo;
               },
             ),
           ),

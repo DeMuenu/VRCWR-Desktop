@@ -1,15 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
 class InfoPage extends StatefulWidget {
   final VrchatApiHandler vrcApi;
   final VoteApiHandler voteApi;
+  final Applogic aL;
 
 
-  const InfoPage(this.vrcApi, this.voteApi,{super.key});
+  const InfoPage(this.vrcApi, this.voteApi, this.aL,{super.key});
 
   @override
   State<InfoPage> createState() => _InfoPageState();
@@ -41,7 +43,7 @@ class _InfoPageState extends State<InfoPage> {
     return Container(color: const Color.fromARGB(255, 15, 15, 15),
         child:
           Center(child: 
-            vrcApi.currentLocation != null ?
+            widget.aL.selectedWorldVrc != null ?
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -57,13 +59,13 @@ class _InfoPageState extends State<InfoPage> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                          if (vrcApi.currentLocation?.thumbnailImageUrl.isNotEmpty ?? false)
+                          if (widget.aL.selectedWorldVrc?.thumbnailImageUrl.isNotEmpty ?? false)
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             clipBehavior: Clip.antiAlias,
                             child:                         
                               Image.network(
-                                vrcApi.currentLocation?.thumbnailImageUrl ?? "",
+                                widget.aL.selectedWorldVrc?.thumbnailImageUrl ?? "",
                                 headers: vrcApi.imageHeaders,
                               ),
                           ),
@@ -73,9 +75,9 @@ class _InfoPageState extends State<InfoPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(vrcApi.currentLocation?.name ?? "", style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
-                              Text(vrcApi.currentLocation?.authorName ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214), fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
-                              Text(vrcApi.currentLocation?.description ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214)), overflow: TextOverflow.fade, softWrap: true,maxLines: 4, textAlign: TextAlign.left,),
+                              Text(widget.aL.selectedWorldVrc?.name ?? "", style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
+                              Text(widget.aL.selectedWorldVrc?.authorName ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214), fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
+                              Text(widget.aL.selectedWorldVrc?.description ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214)), overflow: TextOverflow.fade, softWrap: true,maxLines: 4, textAlign: TextAlign.left,),
                             ],
                             ),
                           )

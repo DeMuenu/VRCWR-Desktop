@@ -99,14 +99,14 @@ class _MyAppState extends State<MyApp> {
                 child: !widget.vrchatApi.isLoggedIn
                     ? VRCLoginScreen(api: widget.vrchatApi)
                     : switch (widget.appLogic.selectedTab) {
-                        TabSelection.worlds => RecommendationScreen(widget.vrchatApi, widget.voteApi),
+                        TabSelection.worlds => RecommendationScreen(widget.vrchatApi, widget.voteApi, widget.appLogic),
                         TabSelection.voting => !widget.voteApi.isLoggedIn
                             ? VoteLoginScreen(
                                 voteApi: widget.voteApi,
                                 vrchatApi: widget.vrchatApi,
                               )
                             : VotePage(widget.vrchatApi, widget.voteApi),
-                        TabSelection.worldInfo => InfoPage(widget.vrchatApi, widget.voteApi),
+                        TabSelection.worldInfo => InfoPage(widget.vrchatApi, widget.voteApi, widget.appLogic),
                       },
               ),
               Align(

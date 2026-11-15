@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
@@ -210,8 +211,8 @@ class _VotePageState extends State<VotePage> {
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(16),
                                   onTap: () async{
-                                   //print("See other reviews");
-                                    setState(() {});
+                                    await vrcApi.aL.setSelectedWorld(vrcApi.currentLocation?.id ?? "000");
+                                    vrcApi.aL.selectedTab = TabSelection.worldInfo;
                                   },
                                   child: const Padding(
                                     padding: EdgeInsets.all(8.0),
