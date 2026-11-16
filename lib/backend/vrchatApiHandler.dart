@@ -6,6 +6,8 @@ import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/secureStorage.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:dio/dio.dart';
+import 'package:vrcwr/pages/infoPage.dart';
 
 
 class VrchatApiHandler extends ChangeNotifier{
@@ -211,6 +213,39 @@ class VrchatApiHandler extends ChangeNotifier{
     }
     
   }
+
+  Future<bool> createInstance(CreateInstanceRequestRegion region, CombinedInstanceType instanceType, String worldId) async {
+    try {
+      final response = await api.rawApi.getInstancesApi().createInstance(
+            createInstanceRequest: CreateInstanceRequest(
+              region: region,
+              type: instanceType.instanceType,
+              ownerId: instanceType.ownerId ? currentUser!.id : null,
+              canRequestInvite: instanceType.canRequestInvite,
+              worldId: worldId,
+            ),
+          );
+      
+      Instance? instance = response.data;
+
+      //await Future.delayed(Duration(seconds: 5));
+      print(instance);
+      if (instance != null) {
+        await api.rawApi.getInviteApi().inviteMyselfTo(
+              worldId: worldId,
+              instanceId: instance.instanceId,
+            );
+        return true;
+      }
+    } on DioException catch (e) {
+      // Print the exact validation error message from VRChat's API
+      print('Failed to create instance: ${e.response?.statusCode} - ${e.response?.data}');
+    } catch (e) {
+      print('Unexpected error creating instance: $e');
+    }
+    return false;
+  }
+
 
   Future<bool> logout() async {
     await api.auth.logout();

@@ -156,7 +156,6 @@ class _VotePageState extends State<VotePage> {
                                   borderRadius: BorderRadius.circular(16),
                                 onTap: () async{
                                   if (widget.voteApi.generalVoteScore == 0) {
-                                    String action = widget.voteApi.hasOwnExistingReview ? "updated" : "published";
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text('You need to up/downvote the world.')),
                                     );
