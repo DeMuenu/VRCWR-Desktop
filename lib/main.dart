@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:updat/updat.dart';
 import 'package:vrcwr/backend/appLogic.dart';
@@ -85,6 +86,7 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp(
         theme: ThemeData.dark(),
         home: Scaffold(
+          extendBodyBehindAppBar: true,
           appBar: widget.vrchatApi.isLoggedIn
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -95,6 +97,13 @@ class _MyAppState extends State<MyApp> {
               : null,
           body: Stack(
             children: [
+              Positioned.fill(
+                child: SvgPicture.asset(
+                  'assets/grid.svg', // Update with your asset path
+                  fit: BoxFit.cover,       // Ensures it fills the window nicely
+                ),
+              ),
+
               Positioned.fill(
                 child: !widget.vrchatApi.isLoggedIn
                     ? VRCLoginScreen(api: widget.vrchatApi)
@@ -178,6 +187,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     
                     appName: "VRCWR",
+                    closeOnInstall: true,
                       ),
                     ),
               ),

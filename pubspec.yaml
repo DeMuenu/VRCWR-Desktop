@@ -45,6 +45,7 @@ dependencies:
   infinite_scroll_pagination: ^5.1.1
   package_info_plus: ^10.2.2
   updat: ^1.4.0
+  flutter_svg: ^2.0.10
   
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/grid.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -99,6 +103,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  fonts:
+    - family: KaushanScript
+      fonts:
+        - asset: fonts/KaushanScript-Regular.ttf
 
 
 inno_bundle:

@@ -39,18 +39,18 @@ class _VotePageState extends State<VotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: const Color.fromARGB(255, 15, 15, 15),
+    return Container(color: Colors.transparent,
         child:
           Center(child: 
             vrcApi.currentLocation != null ?
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                SizedBox(height: 50),
                 Padding(
                   padding: const .symmetric(horizontal: 16),
                   // ignore: deprecated_member_use
                   child: Column(children: [
-                    Center(child: Text("Rate the current world", style: TextStyle(fontSize: 40, color: Colors.white),)),
                     Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Color.fromARGB(255, 43, 43, 43),),

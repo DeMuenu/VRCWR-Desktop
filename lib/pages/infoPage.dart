@@ -61,18 +61,19 @@ class _InfoPageState extends State<InfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: const Color.fromARGB(255, 15, 15, 15),
+    return Container(color: Colors.transparent,
         child:
           Center(child: 
             widget.aL.selectedWorldVrc != null ?
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                SizedBox(height: 50),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   // ignore: deprecated_member_use
                   child: Column(children: [
-                    Center(child: Text("World Info", style: TextStyle(fontSize: 40, color: Colors.white),)),
                     SizedBox(
                       width: double.infinity,
                       child: Container(
