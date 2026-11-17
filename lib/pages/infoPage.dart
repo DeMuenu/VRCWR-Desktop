@@ -65,144 +65,172 @@ class _InfoPageState extends State<InfoPage> {
         child:
           Center(child: 
             widget.aL.selectedWorldVrc != null ?
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 50),
+            
+            Row(children: [
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  // ignore: deprecated_member_use
-                  child: Column(children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Color.fromARGB(255, 43, 43, 43),),
-                      child: 
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                          if (widget.aL.selectedWorldVrc?.thumbnailImageUrl.isNotEmpty ?? false)
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            clipBehavior: Clip.antiAlias,
-                            child:                         
-                              Image.network(
-                                widget.aL.selectedWorldVrc?.thumbnailImageUrl ?? "",
-                                headers: vrcApi.imageHeaders,
-                              ),
-                          ),
-                          SizedBox(width: 12,),
-                          Expanded(
-                            child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(widget.aL.selectedWorldVrc?.name ?? "", style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
-                              Text(widget.aL.selectedWorldVrc?.authorName ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214), fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
-                              Text(widget.aL.selectedWorldVrc?.description ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214)), overflow: TextOverflow.fade, softWrap: true,maxLines: 4, textAlign: TextAlign.left,),
-                            ],
+              Expanded(flex: 1, child: 
+                Padding(padding: EdgeInsetsGeometry.all(20), child: 
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 50,),
+                      if (widget.aL.selectedWorldVrc?.imageUrl.isNotEmpty ?? false)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          
+                          child:                         
+                            Image.network(
+                              widget.aL.selectedWorldVrc?.imageUrl ?? "",
+                              headers: vrcApi.imageHeaders,
                             ),
-                          )
-                          ],
                         ),
-                    ),
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: Text("Create instance.", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left,),
-                    ),
-                    
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("Location: ", style: TextStyle(fontSize: 20), textAlign: TextAlign.left,),
-                        DropdownButton<CreateInstanceRequestRegion>(
-                          value: createInstanceRegion,
-                          items: [
-                            for (CreateInstanceRequestRegion item in CreateInstanceRequestRegion.values)
-                              DropdownMenuItem<CreateInstanceRequestRegion>(
-                                value: item,
-                                child: Text(item.name),
+
+                        SizedBox(height: 30,),
+
+                        DecoratedBox(
+                          decoration: BoxDecoration(color: Color.fromARGB(100, 0, 0, 0), borderRadius: BorderRadius.circular(4)),
+                          child: Padding(padding: EdgeInsetsGeometry.all(15),
+                            child: 
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                              SizedBox(
+                                width: double.infinity,
+                                child: Text("Create instance", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left,),
+                              ),
+
+                              Row(children: [
+                                Text("Location: ", style: TextStyle(fontSize: 20), textAlign: TextAlign.left,),
+                                DropdownButton<CreateInstanceRequestRegion>(
+                                  value: createInstanceRegion,
+                                  items: [
+                                    for (CreateInstanceRequestRegion item in CreateInstanceRequestRegion.values)
+                                      DropdownMenuItem<CreateInstanceRequestRegion>(
+                                        value: item,
+                                        child: Text(item.name),
+                                        
+                                      ),
+                                  ],
+                                  onChanged: (CreateInstanceRequestRegion? value) {
+                                    if(value != null){
+                                      setState(() {
+                                        createInstanceRegion = value;
+                                      });
+                                    }
+                                  },
+                                ),
+
+                              ]),
+
+                              Row(children: [
+                                Text("Type: ", style: TextStyle(fontSize: 20), textAlign: TextAlign.left,),
+                                DropdownButton<int>(
+                                  value: combinedInstanceTypeNumber,
+                                  items: instanceOptions.asMap().entries.map((indexedEntry) {
+                                    return DropdownMenuItem<int>(
+                                      value: indexedEntry.key,
+                                      child: Text(indexedEntry.value.key),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int? value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        combinedInstanceTypeNumber = value;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ]),
+
+                              SizedBox(height: 5,),
+
+                              Padding(
                                 
-                              ),
-                          ],
-                          onChanged: (CreateInstanceRequestRegion? value) {
-                            if(value != null){
-                              setState(() {
-                                createInstanceRegion = value;
-                              });
-                            }
-                          },
-                        ),
+                                padding: const EdgeInsets.all(0.0),
+                                child: SizedBox(
+                                  
+                                  width: 150,
+                                  child: Material(
+                                      color: Colors.amber,
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(4),
+                                      onTap: () async {
+                                        final bool success = await vrcApi.createInstance(
+                                          createInstanceRegion,
+                                          instanceOptions[combinedInstanceTypeNumber].value,
+                                          vrcApi.aL.selectedWorldId,
+                                        );
 
-                        SizedBox(width: 10,),
-                        Text("Type: ", style: TextStyle(fontSize: 20), textAlign: TextAlign.left,),
-                        DropdownButton<int>(
-                          value: combinedInstanceTypeNumber,
-                          items: instanceOptions.asMap().entries.map((indexedEntry) {
-                            return DropdownMenuItem<int>(
-                              value: indexedEntry.key,
-                              child: Text(indexedEntry.value.key),
-                            );
-                          }).toList(),
-                          onChanged: (int? value) {
-                            if (value != null) {
-                              setState(() {
-                                combinedInstanceTypeNumber = value;
-                              });
-                            }
-                          },
-                        ),
+                                        if (!mounted) return;
 
-                        SizedBox(width: 10,),
-
-                        Padding(
-                        padding: const EdgeInsets.all(0.0),
-                        child: SizedBox(
-                          width: 150,
-                          child: Material(
-                              color: Colors.blueGrey,
-                              borderRadius: BorderRadius.circular(16),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                              onTap: () async {
-                                final bool success = await vrcApi.createInstance(
-                                  createInstanceRegion,
-                                  instanceOptions[combinedInstanceTypeNumber].value,
-                                  vrcApi.aL.selectedWorldId,
-                                );
-
-                                if (!mounted) return;
-
-                                if (success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Instance created!'),
+                                        if (success) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Instance created!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(4.0),
+                                        child: Text("Create & Invite me", textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),
+                                      ),
                                     ),
-                                  );
-                                }
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(4.0),
-                                child: Text("Create & Invite me", textAlign: TextAlign.center),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
+
+
+                            ],)
+                          )
+                        
+                        
+                        ,),
+
+                        
+                      
+                      ]
+                  ),
+                )
+              ),
+
+
+
+
+              Expanded(flex: 2, child: 
+                Padding(padding: EdgeInsetsGeometry.all(20), child: 
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 50),
+
+                      Text(widget.aL.selectedWorldVrc?.name ?? "", style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 2, textAlign: TextAlign.left,),
+                      SizedBox(height: 5,),
+
+                      Text(widget.aL.selectedWorldVrc?.authorName ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214), fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
+
+                      SizedBox(height: 10,),
+                      Divider(
+                        color: Colors.white
                       ),
-                      ],
-                    )
+                      SizedBox(height: 10,),
+                      Text(widget.aL.selectedWorldVrc?.description ?? "", style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 214, 214, 214)), overflow: TextOverflow.fade, softWrap: true,maxLines: 8, textAlign: TextAlign.left,),
                     
-                  ],),
-                ),
-              ]
-            )
-            :
-            Center(child: Text("Select a world", style: TextStyle(fontSize: 40, color: Colors.white),))
-        )
+                      SizedBox(height: 20,),
+                      Text("Reviews", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), overflow: TextOverflow.fade, maxLines: 1, textAlign: TextAlign.left,),
+                      
+                    ]
+                  )
+                )
+              )])
+              :
+              Center(child: Text("Select a world", style: TextStyle(fontSize: 40, color: Colors.white),))
+          
+          )
+          
     );
   }
 

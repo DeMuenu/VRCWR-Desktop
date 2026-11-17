@@ -260,25 +260,6 @@ class VrchatApiHandler extends ChangeNotifier{
   void startRealtimeStream() {
     api.streaming.vrcEventStream.listen((Object event) async {
       switch (event) {
-        case WebsocketFriendOnline():
-          // Has: userId, location, platform, canRequestInvite
-         //print('Friend came online: ${event.userId} (Location: ${event.location})');
-          break;
-
-        case WebsocketFriendOffline():
-          // Has: userId, platform
-         //print('Friend went offline: ${event.userId}');
-          break;
-
-        case WebsocketFriendLocation():
-          // Has: user, userId, location, travelingToLocation, worldId, canRequestInvite
-         //print('${event.user.displayName} moved to world ID: ${event.worldId} (${event.location})');
-          break;
-
-        case WebsocketFriendUpdate():
-          // Has: user, userId
-         //print('${event.user.displayName} updated their profile');
-          break;
 
         case WebsocketUserLocation():
           // Has: user, userId, location, instance, travelingToLocation
@@ -304,11 +285,6 @@ class VrchatApiHandler extends ChangeNotifier{
           }
 
           notifyListeners();
-          break;
-
-        case VrcStreamingError():
-          // Has: message
-         //print('WebSocket pipeline error: ${event.message}');
           break;
 
         default:

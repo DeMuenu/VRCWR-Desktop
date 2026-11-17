@@ -39,8 +39,44 @@ class _VotePageState extends State<VotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.transparent,
-        child:
+
+    final List<Color> inactiveColors = [
+      Color.fromARGB(1, 0, 0, 0),
+      Color.fromARGB(1, 0, 0, 0),
+    ];
+
+    final List<Color> upvoteColors = [
+      const Color.fromARGB(40, 0, 110, 40),
+      Color.fromARGB(10, 0, 0, 0),
+      Color.fromARGB(10, 0, 0, 0),
+      Color.fromARGB(10, 0, 0, 0),
+      Color.fromARGB(10, 0, 0, 0),
+    ];
+
+    final List<Color> downvoteColors = [
+      Color.fromARGB(10, 0, 0, 0),
+      Color.fromARGB(10, 0, 0, 0),
+      Color.fromARGB(10, 0, 0, 0),
+      Color.fromARGB(10, 0, 0, 0),
+      const Color.fromARGB(40, 130, 20, 20),
+    ];
+
+    return AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        width: 90,
+        height: 150,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: widget.voteApi.generalVoteScore == 0
+                ? inactiveColors
+                : (widget.voteApi.generalVoteScore > 0 ? upvoteColors : downvoteColors),
+          ),
+        ),
+        child: 
           Center(child: 
             vrcApi.currentLocation != null ?
             Row(children: [
@@ -241,7 +277,7 @@ class _VotePageState extends State<VotePage> {
                           child: SizedBox(
                             width: 120,
                             child: Material(
-                                color: Color.fromARGB(150, 30, 30, 30),
+                                color: Colors.amber,
                                 borderRadius: BorderRadius.circular(4),
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(4),
