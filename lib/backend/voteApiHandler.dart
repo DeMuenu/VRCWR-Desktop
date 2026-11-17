@@ -229,7 +229,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   Future<void> logout() async {
     SecureStorage secureStorage = SecureStorage();
-    secureStorage.delete("vote_token");
+    await secureStorage.delete("vote_token");
     isLoggedIn = false;
     exit(0);
   }
