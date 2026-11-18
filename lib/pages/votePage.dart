@@ -19,7 +19,7 @@ class VotePage extends StatefulWidget {
 
 class _VotePageState extends State<VotePage> {
   late VrchatApiHandler vrcApi;
-
+  bool _hasRequest = false;
 
 
   @override
@@ -282,10 +282,14 @@ class _VotePageState extends State<VotePage> {
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(4),
                                 onTap: () async{
+                                  if (_hasRequest) return;
+
                                   if(widget.vrcApi.currentLocation != null){
+                                    _hasRequest = true;
                                     if (await widget.voteApi.addWorld(vrcApi.currentLocation?.id ?? "000")){
                                       await widget.voteApi.updateCurrentWorld();
                                     }
+                                    _hasRequest = false;
                                   }
                                   setState(() {});
                                 },
@@ -373,39 +377,6 @@ class _VotePageState extends State<VotePage> {
     );
   }
 
-  Widget tagContainer(
-    IconData currentIcon,
-    String text,
-    bool value,
-    ValueChanged<bool> onScoreChanged
-    ) {
-    return SizedBox(
-      width: 90,
-      height: 90,
-      child: 
-          Material(
-            borderRadius: BorderRadius.circular(12),
-            clipBehavior: Clip.antiAlias,
-            color: (value != true) ? Color.fromARGB(255, 30, 30, 30) : Color.fromARGB(255, 0, 33, 3),
-            child: 
-              InkWell(
-                onTap: () {
-                  onScoreChanged(!value);
-                },
-                child: 
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(currentIcon, size: 30, color: (value != true) ? Colors.white : Colors.blue),
-                      Text(text, style: TextStyle(fontSize: 15, color: (value != true) ? Colors.white : Colors.blue)),
-                    ],
-                  ),
-              ),
-            )
-          
-          
-    );
-  }
+
 
 }

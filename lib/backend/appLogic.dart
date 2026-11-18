@@ -38,6 +38,8 @@ class Applogic extends ChangeNotifier {
     if (selectedWorldExistsOnServer){
       selectedWorldVote = await voteApi.getCachedWorldVoteInfo(worldId, forceRefresh: true);
       selectedWorldTags = await voteApi.loadWorldTags(worldId) ?? [];
+      print(selectedWorldTags[0].upvotes);
+      print(selectedWorldTags[0].downvotes);
     }
     else{
       selectedWorldVote = DownstreamWorldVoteInfo.fromJson({
