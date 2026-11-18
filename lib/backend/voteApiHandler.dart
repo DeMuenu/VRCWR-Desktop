@@ -229,7 +229,7 @@ class VoteApiHandler extends ChangeNotifier {
 
   Future<void> logout() async {
     SecureStorage secureStorage = SecureStorage();
-    secureStorage.delete("vote_token");
+    await secureStorage.delete("vote_token");
     isLoggedIn = false;
     exit(0);
   }
@@ -256,8 +256,8 @@ class VoteApiHandler extends ChangeNotifier {
     return true;
   }
 
-  Future<DownstreamWorldVoteInfo?> getCachedWorldVoteInfo(String worldId) async{
-    if (cachedWorldRatings.containsKey(worldId)){
+  Future<DownstreamWorldVoteInfo?> getCachedWorldVoteInfo(String worldId, {bool forceRefresh = false}) async{
+    if (cachedWorldRatings.containsKey(worldId) && forceRefresh == false){
       return cachedWorldRatings[worldId];
     }
     else{
@@ -301,7 +301,7 @@ class VoteApiHandler extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      lastErrorMessage = 'Network error: $e';
+      //lastErrorMessage = 'Network error: $e';
       notifyListeners();
       return false;
     }
@@ -422,7 +422,7 @@ class VoteApiHandler extends ChangeNotifier {
 
     try {
       final response = await http.get(url, headers: _defaultHeaders);
-     //print(response.body);
+     print(response.body);
       final dynamic decoded = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -439,10 +439,56 @@ class VoteApiHandler extends ChangeNotifier {
        //print(worldTags.length);
         return worldTags;
       } else {
-        final message = decoded is Map && decoded['message'] is String
-            ? decoded['message'] as String
-            : 'Failed to load world tags (${response.statusCode})';
-        lastErrorMessage = message;
+        //final message = decoded is Map && decoded['message'] is String
+        //    ? decoded['message'] as String
+        //    : 'Failed to load world tags (${response.statusCode})';
+        //lastErrorMessage = message;
+        notifyListeners();
+        return null;
+      }
+    } catch (e) {
+      lastErrorMessage = 'Network error: $e';
+      notifyListeners();
+      return null;
+    }
+  }
+
+  
+
+  Future<WorldReviewsResponse?> loadWorldReviews(
+    String worldId, {
+    int page = 1,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl/api/world_reviews_get').replace(
+      queryParameters: {
+        'world_id': worldId,
+        'page': page.toString(),
+        'sort_by' : 'created_at',
+        'sort_order' : 'asc',
+        'per_page' : '10'
+      },
+    );
+
+    try {
+      final response = await http.get(url, headers: _authHeaders);
+      final dynamic decoded = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        if (decoded is! Map) {
+          lastErrorMessage = 'Unexpected world reviews response format.';
+          notifyListeners();
+          return null;
+        }
+
+        lastErrorMessage = null;
+        return WorldReviewsResponse.fromJson(
+          Map<String, dynamic>.from(decoded),
+        );
+      } else {
+        //final message = decoded is Map && decoded['message'] is String
+        //    ? decoded['message'] as String
+        //    : 'Failed to load world reviews (${response.statusCode})';
+        //lastErrorMessage = message;
         notifyListeners();
         return null;
       }
@@ -663,8 +709,8 @@ class WorldTag {
       id: json['id'] as int? ?? 0,
       worldId: json['world_id'] as String? ?? '',
       tag: json['tag'] as String? ?? '',
-      upvotes: json['upvotes'] as int? ?? 0,
-      downvotes: json['downvotes'] as int? ?? 0,
+      upvotes: json['upvotes_count'] as int? ?? 0,
+      downvotes: json['downvotes_count'] as int? ?? 0,
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? epoch,
       updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? epoch,
     );
@@ -740,6 +786,162 @@ class MyWorldReview {
           DateTime.tryParse(json['created_at'] as String? ?? '') ?? epoch,
       updatedAt:
           DateTime.tryParse(json['updated_at'] as String? ?? '') ?? epoch,
+    );
+  }
+}
+
+
+class WorldReviewsResponse {
+  final int currentPage;
+  final List<WorldReview> data;
+  final String firstPageUrl;
+  final int? from;
+  final int lastPage;
+  final String lastPageUrl;
+  final List<WorldReviewsPageLink> links;
+  final String? nextPageUrl;
+  final String path;
+  final int perPage;
+  final String? prevPageUrl;
+  final int? to;
+  final int total;
+
+  const WorldReviewsResponse({
+    required this.currentPage,
+    required this.data,
+    required this.firstPageUrl,
+    required this.from,
+    required this.lastPage,
+    required this.lastPageUrl,
+    required this.links,
+    required this.nextPageUrl,
+    required this.path,
+    required this.perPage,
+    required this.prevPageUrl,
+    required this.to,
+    required this.total,
+  });
+
+  factory WorldReviewsResponse.fromJson(Map<String, dynamic> json) {
+    return WorldReviewsResponse(
+      currentPage: json['current_page'] as int? ?? 1,
+      data: (json['data'] as List<dynamic>? ?? const [])
+          .map(
+            (item) =>
+                WorldReview.fromJson(Map<String, dynamic>.from(item as Map)),
+          )
+          .toList(),
+      firstPageUrl: json['first_page_url'] as String? ?? '',
+      from: json['from'] as int?,
+      lastPage: json['last_page'] as int? ?? 1,
+      lastPageUrl: json['last_page_url'] as String? ?? '',
+      links: (json['links'] as List<dynamic>? ?? const [])
+          .map(
+            (item) => WorldReviewsPageLink.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList(),
+      nextPageUrl: json['next_page_url'] as String?,
+      path: json['path'] as String? ?? '',
+      perPage: json['per_page'] as int? ?? 10,
+      prevPageUrl: json['prev_page_url'] as String?,
+      to: json['to'] as int?,
+      total: json['total'] as int? ?? 0,
+    );
+  }
+}
+
+class WorldReviewsPageLink {
+  final String? url;
+  final String label;
+  final int? page;
+  final bool active;
+
+  const WorldReviewsPageLink({
+    required this.url,
+    required this.label,
+    required this.page,
+    required this.active,
+  });
+
+  factory WorldReviewsPageLink.fromJson(Map<String, dynamic> json) {
+    return WorldReviewsPageLink(
+      url: json['url'] as String?,
+      label: json['label'] as String? ?? '',
+      page: json['page'] as int?,
+      active: json['active'] as bool? ?? false,
+    );
+  }
+}
+
+class WorldReview {
+  final int id;
+  final String worldId;
+  final String userId;
+  final int like;
+  final String? comment;
+  final String status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int upvotesCount;
+  final int downvotesCount;
+  final WorldReviewUser user;
+
+  const WorldReview({
+    required this.id,
+    required this.worldId,
+    required this.userId,
+    required this.like,
+    required this.comment,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.upvotesCount,
+    required this.downvotesCount,
+    required this.user,
+  });
+
+  factory WorldReview.fromJson(Map<String, dynamic> json) {
+    final epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    final rawUser = json['user'];
+
+    return WorldReview(
+      id: json['id'] as int? ?? 0,
+      worldId: json['world_id'] as String? ?? '',
+      userId: json['user_id'] as String? ?? '',
+      like: json['like'] as int? ?? 0,
+      comment: json['comment'] as String?,
+      status: json['status'] as String? ?? '',
+      createdAt:
+          DateTime.tryParse(json['created_at'] as String? ?? '') ?? epoch,
+      updatedAt:
+          DateTime.tryParse(json['updated_at'] as String? ?? '') ?? epoch,
+      upvotesCount: json['upvotes_count'] as int? ?? 0,
+      downvotesCount: json['downvotes_count'] as int? ?? 0,
+      user: WorldReviewUser.fromJson(
+        rawUser is Map ? Map<String, dynamic>.from(rawUser) : const {},
+      ),
+    );
+  }
+}
+
+class WorldReviewUser {
+  final String userId;
+  final String username;
+  final String userIcon;
+
+  const WorldReviewUser({
+    required this.userId,
+    required this.username,
+    required this.userIcon,
+  });
+
+  factory WorldReviewUser.fromJson(Map<String, dynamic> json) {
+    return WorldReviewUser(
+      userId: json['user_id'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      userIcon: json['user_icon'] as String? ?? '',
     );
   }
 }
