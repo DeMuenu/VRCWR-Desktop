@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:updat/updat.dart';
 import 'package:vrcwr/backend/appLogic.dart';
@@ -125,37 +126,16 @@ class _MyAppState extends State<MyApp> {
                   child: UpdatWidget(
                     currentVersion: widget.packageVersion,
                     getLatestVersion: () async {
-                      final client = HttpClient();
-                      try {
-                        String releaseLoc = "";
-                        if (Platform.isWindows) {
-                          releaseLoc = "https://vrcwr.lunar-appupdater.download/winVersion.json";
-                        } else if (Platform.isLinux) {
-                          releaseLoc = "https://vrcwr.lunar-appupdater.download/winVersion.json"; //TODO add linux link
-                        }
+                        final data = await http.get(Uri.parse(
+                            "https://api.github.com/repos/DeMuenu/VRCWR-Desktop/releases/latest",
+                        ));
 
-                        final request = await client.getUrl(
-                          Uri.parse(releaseLoc),
-                        );
-                        final response = await request.close();
-                        final body = await response.transform(utf8.decoder).join();
-
-                        if (response.statusCode != HttpStatus.ok) {
-                          throw HttpException(
-                            'Could not fetch latest version: HTTP ${response.statusCode}',
-                          );
-                        }
-
-                        final json = jsonDecode(body) as Map<String, dynamic>;
-                        return json['version'] as String;
-                          } finally {
-                            client.close();
-                          }
-                        },
+                        return jsonDecode(data.body)["tag_name"];
+                      },
 
                     getBinaryUrl: (latestVersion) async {
                       if (Platform.isWindows) {
-                        return "https://vrcwr.lunar-appupdater.download/win/VRChatWorldRatingDesktop-x86_64-$latestVersion-Installer.exe";
+                        return "https://github.com/DeMuenu/VRCWR-Desktop/releases/download/$latestVersion/VRChatWorldRatingDesktop-x86_64-$latestVersion-Installer.exe";
                       } else if (Platform.isLinux) {
                         return "https://github.com/latest/release/bin-linux"; //TODO add linux link
                       } 
@@ -163,27 +143,11 @@ class _MyAppState extends State<MyApp> {
                     },
 
                     getChangelog: (latestVersion, appVersion) async {
-                      final client = HttpClient();
-                      try {
-                        String changelogLoc = "https://vrcwr.lunar-appupdater.download/changelog.json";
+                      final data = await http.get(Uri.parse(
+                          "https://api.github.com/repos/DeMuenu/VRCWR-Desktop/releases/latest",
+                      ));
 
-                        final request = await client.getUrl(
-                          Uri.parse(changelogLoc),
-                        );
-                        final response = await request.close();
-                        final body = await response.transform(utf8.decoder).join();
-
-                        if (response.statusCode != HttpStatus.ok) {
-                          throw HttpException(
-                            'Could not fetch latest version: HTTP ${response.statusCode}',
-                          );
-                        }
-
-                        final json = jsonDecode(body) as Map<String, dynamic>;
-                        return json['text'] as String;
-                      } finally {
-                        client.close();
-                      }
+                      return jsonDecode(data.body)["body"];
                     },
                     
                     appName: "VRCWR",
