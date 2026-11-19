@@ -176,7 +176,7 @@ class VrchatApiHandler extends ChangeNotifier{
       }
     }
 
-    final currentUser = api.auth.currentUser;
+    currentUser = api.auth.currentUser;
     if (currentUser != null) {
      //print(
       //  'Successfully logged in as: ${currentUser.displayName} (${currentUser.id})',
