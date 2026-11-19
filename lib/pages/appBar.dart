@@ -28,7 +28,7 @@ Widget appBar(BuildContext context, Applogic aL) {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
-                  width: 120,
+                  width: 90,
                   child: Material(
                       color: const Color.fromARGB(114, 10, 10, 10),
                       borderRadius: BorderRadius.circular(16),
@@ -57,7 +57,7 @@ Widget appBar(BuildContext context, Applogic aL) {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
-                  width: 120,
+                  width: 90,
                   child: Material(
                       color: const Color.fromARGB(114, 10, 10, 10),
                       borderRadius: BorderRadius.circular(16),
@@ -86,7 +86,7 @@ Widget appBar(BuildContext context, Applogic aL) {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
-                  width: 120,
+                  width: 90,
                   child: Material(
                       color: const Color.fromARGB(114, 10, 10, 10),
                       borderRadius: BorderRadius.circular(16),
@@ -109,6 +109,48 @@ Widget appBar(BuildContext context, Applogic aL) {
                   ),
                 ),
               ),
+
+              if (aL.selectedTab == TabSelection.worlds)...[
+
+                VerticalDivider(
+                  color: Colors.white,
+                  indent: 6,
+                  endIndent: 6,
+                ),
+
+                SizedBox(width: 25,),
+
+                DropdownButton<WorldListSortOrder>(
+                  dropdownColor: Color.fromARGB(255, 0, 0, 0),
+                  
+                  value: aL.listSortOrder,
+                  items: [
+                    /*for (WorldListSortOrder item in WorldListSortOrder.values)
+                      DropdownMenuItem<WorldListSortOrder>(
+                        value: item,
+                        child: Text(item.name),
+                        
+                      ),*/
+
+                    DropdownMenuItem<WorldListSortOrder>(
+                        value: WorldListSortOrder.newAndNoteworthy,
+                        child: Text("New and Noteworthy"), 
+                      ),
+                    DropdownMenuItem<WorldListSortOrder>(
+                        value: WorldListSortOrder.popularity,
+                        child: Text("Popular"), 
+                      ),
+                  ],
+                  onChanged: (WorldListSortOrder? value) {
+                    if(value != null){
+                      setState(() {
+                        aL.setListSortOrder(value);
+                      });
+                    }
+                  },
+                ),
+
+              ],
 
               Spacer(),
 

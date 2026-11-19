@@ -22,23 +22,16 @@ class RecommendationScreen extends StatefulWidget {
 }
 
 class _RecommendationScreenState extends State<RecommendationScreen> {
-  final int pageSize = 60;
-  SortOption sortOption = SortOption.hotness;
-  String worldTag = 'system_published_recently';
-  late final _pagingController = PagingController<int, LimitedWorld>(
-    getNextPageKey: (state) => state.lastPageIsEmpty ? null : state.nextIntPageKey,
-    fetchPage: (pageKey) async => await widget.vrcApi.getRecommendations(sortOption, (pageKey - 1) * pageSize, tag: worldTag, reqCount: pageSize),
-  );
+
 
   @override
   void dispose() {
-    _pagingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => Padding(padding: EdgeInsetsGeometry.all(8), child:  PagingListener(
-      controller: _pagingController,
+      controller: widget.aL.worldListPagingController,
       builder: (context, state, fetchNextPage) => PagedGridView<int, LimitedWorld>(
         state: state,
         fetchNextPage: fetchNextPage,

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
@@ -10,12 +11,25 @@ enum TabSelection{
   worldInfo,
 }
 
+enum WorldListSortOrder{
+  newAndNoteworthy,
+  popularity,
+}
+
 class Applogic extends ChangeNotifier {
   TabSelection _selectedTab = TabSelection.worlds;
   late VoteApiHandler voteApi;
   late VrchatApiHandler vrcApi;
   TabSelection get selectedTab => _selectedTab;
 
+  WorldListSortOrder listSortOrder = WorldListSortOrder.newAndNoteworthy;
+  SortOption currentWorldListSortOption = SortOption.hotness;
+  String? currentWorldListTag = "system_published_recently";
+  final int pageSize = 60;
+  late final worldListPagingController = PagingController<int, LimitedWorld>(
+    getNextPageKey: (state) => state.lastPageIsEmpty ? null : state.nextIntPageKey,
+    fetchPage: (pageKey) async => await vrcApi.getRecommendations(currentWorldListSortOption, listSortOrder, (pageKey - 1) * pageSize, tag: currentWorldListTag, reqCount: pageSize),
+  );
 
   Applogic(this.voteApi, this.vrcApi);
 
@@ -48,6 +62,22 @@ class Applogic extends ChangeNotifier {
       selectedWorldTags.clear();
     }
     notifyListeners();
+  }
+
+  void setListSortOrder(WorldListSortOrder order){
+    switch(order){
+      case WorldListSortOrder.newAndNoteworthy:
+        listSortOrder = WorldListSortOrder.newAndNoteworthy;
+        currentWorldListSortOption = SortOption.hotness;
+        currentWorldListTag = "system_published_recently";
+      case WorldListSortOrder.popularity:
+        listSortOrder = WorldListSortOrder.popularity;
+        currentWorldListSortOption = SortOption.popularity;
+        currentWorldListTag = null;
+    }
+
+    worldListPagingController.refresh();
+
   }
 
 

@@ -43,7 +43,7 @@ class VrchatApiHandler extends ChangeNotifier{
     'User-Agent': userAgent.toString(),
   };
 
-  Map<SortOption, List<LimitedWorld>> cachedRecommendations = {};
+  Map<WorldListSortOrder, List<LimitedWorld>> cachedRecommendations = {};
 
   VrchatApiHandler(this.packageVersion);
 
@@ -193,23 +193,23 @@ class VrchatApiHandler extends ChangeNotifier{
     return true;
   }
 
-  Future<List<LimitedWorld>> getRecommendations(SortOption sortOption, int offset, {tag = null, reqCount = 60}) async {
+  Future<List<LimitedWorld>> getRecommendations(SortOption sortOption, WorldListSortOrder worldListSortOrder, int offset, {tag = null, reqCount = 60}) async {
     if (!isLoggedIn){
      //print("Not logged in.");
       return [];
     }
 
-    if((cachedRecommendations[sortOption]?.length ?? 0) < offset + reqCount)
+    if((cachedRecommendations[worldListSortOrder]?.length ?? 0) < offset + reqCount)
     {
-      offset = max(offset, cachedRecommendations[sortOption]?.length ?? 0);
+      offset = max(offset, cachedRecommendations[worldListSortOrder]?.length ?? 0);
       final worlds = (await api.rawApi.getWorldsApi().searchWorlds(sort: sortOption, n: reqCount, offset: offset, tag: tag)).data ?? <LimitedWorld>[];
-      int len = worlds.length;
-     //print('Recommendations not cached requesting more. Got: $len');
-      cachedRecommendations.putIfAbsent(sortOption, () => <LimitedWorld>[]).addAll(worlds);
+     int len = worlds.length;
+     print('Recommendations not cached requesting more. Got: $len');
+      cachedRecommendations.putIfAbsent(worldListSortOrder, () => <LimitedWorld>[]).addAll(worlds);
       return worlds;
     }
     else{
-      return cachedRecommendations[sortOption]!.sublist(offset, (offset + reqCount) as int?);
+      return cachedRecommendations[worldListSortOrder]!.sublist(offset, (offset + reqCount) as int?);
     }
     
   }
