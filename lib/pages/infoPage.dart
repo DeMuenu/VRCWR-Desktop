@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vrchat_dart/vrchat_dart.dart';
 import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
-import 'package:vrchat_dart_generated/src/model/create_instance_request_region.dart';
 
 class InfoPage extends StatefulWidget {
   final VrchatApiHandler vrcApi;
@@ -293,9 +290,9 @@ class _InfoPageState extends State<InfoPage> {
                             fetchNextPage: fetchNextPage,
                             builderDelegate: PagedChildBuilderDelegate(
                               itemBuilder: (context, item, index) => worldItem(item),
-                              noItemsFoundIndicatorBuilder: (context) => const Center(
+                              noItemsFoundIndicatorBuilder: (context) => Center(
                                 child: Text(
-                                  "No comments found",
+                                  widget.aL.voteApi.isLoggedIn ? "No comments found" : "Comments are only visible if you're logged in to VRCWR",
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Color.fromARGB(255, 214, 214, 214),

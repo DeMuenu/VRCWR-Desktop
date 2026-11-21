@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';

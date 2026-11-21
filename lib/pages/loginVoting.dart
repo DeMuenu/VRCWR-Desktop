@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:hyperlink/hyperlink.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
 
@@ -17,6 +21,7 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
   final _emailController = TextEditingController();
   final _votingPasswordController = TextEditingController();
   final _votingPasswordController2 = TextEditingController();
+  bool hasAcceptedTerms = false;
 
   bool _isLoading = true;
   String? _message;
@@ -44,6 +49,14 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
     });
 
     if (!widget.voteApi.isRegisteredUser){
+
+      if(!hasAcceptedTerms){
+        setState(() {
+          _isLoading = false;
+          _message = "You need to accept the privacy policy and terms of use.";
+        });
+        return;
+      }
 
       final hasUpper = RegExp(r'[A-Z]').hasMatch(_votingPasswordController.text);
       final hasLower = RegExp(r'[a-z]').hasMatch(_votingPasswordController.text);
@@ -98,6 +111,12 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _openLink(String link) async {
+    final uri = Uri.tryParse(link);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
 
@@ -174,10 +193,41 @@ class _VoteLoginScreenState extends State<VoteLoginScreen> {
                     decoration: const InputDecoration(labelText: 'Repeat password'),
                     obscureText: true,
                   ),
+
+                  SizedBox(height: 10,),
+
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: hasAcceptedTerms,
+                        onChanged: (value) {
+                          setState(() {
+                            hasAcceptedTerms = value ?? false;
+                          });
+                        },
+                      ),
+                      SizedBox(width: 5,),
+                      
+                      HyperLink
+                      (
+                      textStyle: TextStyle(color: Colors.white, fontSize: 15),
+                      linkStyle: TextStyle(
+                      color: Colors.amber, fontWeight: FontWeight.w700, fontSize: 15),
+                      text:
+                      'I have read the [Privacy policy](https://vrcwr.kokos-labs.at/privacy_policy) and [Terms of use](https://vrcwr.kokos-labs.at/terms_of_use)',
+                      linkCallBack: _openLink,
+                      )
+                    ],
+                  )
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.amber,
+                    textStyle: TextStyle(fontWeight: FontWeight.bold)
+                  ),
                   child: _isLoading
                       ? const SizedBox(
                           width: 20,
