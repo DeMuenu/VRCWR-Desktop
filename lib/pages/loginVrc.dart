@@ -120,6 +120,11 @@ class _VRCLoginScreenState extends State<VRCLoginScreen> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.amber,
+                    textStyle: TextStyle(fontWeight: FontWeight.bold)
+                  ),
                   child: _isLoading
                       ? const SizedBox(
                           width: 20,
