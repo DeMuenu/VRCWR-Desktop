@@ -203,8 +203,9 @@ class VrchatApiHandler extends ChangeNotifier{
     {
       offset = max(offset, cachedRecommendations[worldListSortOrder]?.length ?? 0);
       final worlds = (await api.rawApi.getWorldsApi().searchWorlds(sort: sortOption, n: reqCount, offset: offset, tag: tag)).data ?? <LimitedWorld>[];
-     int len = worlds.length;
-     print('Recommendations not cached requesting more. Got: $len');
+      int len = worlds.length;
+      print('Recommendations not cached requesting more. Got: $len');
+      //print(worlds.first.toString());
       cachedRecommendations.putIfAbsent(worldListSortOrder, () => <LimitedWorld>[]).addAll(worlds);
       return worlds;
     }
