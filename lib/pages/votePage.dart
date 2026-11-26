@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:native_spell_checker/native_spell_checker.dart';
 import 'package:vrcwr/backend/appLogic.dart';
 import 'package:vrcwr/backend/voteApiHandler.dart';
 import 'package:vrcwr/backend/vrchatApiHandler.dart';
@@ -133,13 +134,13 @@ class _VotePageState extends State<VotePage> {
                             mainAxisExtent: 160,
                             maxCrossAxisExtent: 90,
                             children: [
-                              for (int i = widget.voteApi.currentWorldTags.length - 1; i >= 0 && i < 8; i--) 
+                              for (final worldTag in widget.voteApi.currentWorldTags.reversed.take(8))
                                 
                                 voteContainer(
                                   CupertinoIcons.tag, 
-                                  widget.voteApi.currentWorldTags[i].tag.replaceFirst('author_tag_', '').replaceFirst('vrcwr_tag_', ''), 
-                                  widget.voteApi.uiTags[widget.voteApi.currentWorldTags[i].id] ?? 0,
-                                  (score) {setState(() => widget.voteApi.uiTags[widget.voteApi.currentWorldTags[i].id] = score);}
+                                  worldTag.tag.replaceFirst('author_tag_', '').replaceFirst('vrcwr_tag_', ''), 
+                                  widget.voteApi.uiTags[worldTag.id] ?? 0,
+                                  (score) {setState(() => widget.voteApi.uiTags[worldTag.id] = score);}
                                 ),
                                 
                             ],
@@ -162,7 +163,8 @@ class _VotePageState extends State<VotePage> {
                                 DecoratedBox(
                                   decoration: BoxDecoration(color: Color.fromARGB(150, 30, 30, 30), borderRadius: BorderRadius.circular(4)),
                                   child: Padding(padding: const .symmetric(horizontal: 16),
-                                  child: TextField(
+                                  child: 
+                                  SpellCheckTextField(
                                       controller: widget.voteApi.commentBoxController,
                                       decoration: const InputDecoration(
                                         labelText: 'Leave a PUBLIC comment, your username will be shown. (optional)',
@@ -174,6 +176,7 @@ class _VotePageState extends State<VotePage> {
                                       minLines: 4,
                                       maxLines: 4,
                                       maxLength: 500,
+                                      misspelledSelectionColor: Colors.red,
                                     ),
                                   ),
                                 ),

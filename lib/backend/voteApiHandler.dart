@@ -333,8 +333,7 @@ class VoteApiHandler extends ChangeNotifier {
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
-        lastErrorMessage = data['message'] ?? 'Failed to add world (${response.statusCode})';
-        notifyListeners();
+        await invalidateCredentials();
         return false;
       } else if (response.statusCode == 403) {
         lastErrorMessage = "The world is not public yet and can't be reviewed";
@@ -378,9 +377,7 @@ class VoteApiHandler extends ChangeNotifier {
         notifyListeners();
         return true;
       } else if (response.statusCode == 401) {
-        lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
-       //print("Response: $data['message']");
-        notifyListeners();
+        await invalidateCredentials();
         return false;
       } else {
         lastErrorMessage = data['message'] ?? 'Failed to publish review (${response.statusCode})';
@@ -405,9 +402,8 @@ class VoteApiHandler extends ChangeNotifier {
       if (response.statusCode == 200) {
         lastErrorMessage = null;
         return DownstreamWorldVoteInfo.fromJson(data);
-      } else {
-        // lastErrorMessage = data['message'] ?? 'Failed to load world (${response.statusCode})';
-        // notifyListeners();
+      } else if (response.statusCode == 401) {
+        await invalidateCredentials();
         return null;
       }
     } catch (e) {
@@ -422,7 +418,7 @@ class VoteApiHandler extends ChangeNotifier {
 
     try {
       final response = await http.get(url, headers: _defaultHeaders);
-     print(response.body);
+      print(response.body);
       final dynamic decoded = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -438,7 +434,11 @@ class VoteApiHandler extends ChangeNotifier {
             .toList();
        //print(worldTags.length);
         return worldTags;
-      } else {
+      } else if (response.statusCode == 401) {
+        await invalidateCredentials();
+        return null;
+      }
+      else {
         //final message = decoded is Map && decoded['message'] is String
         //    ? decoded['message'] as String
         //    : 'Failed to load world tags (${response.statusCode})';
@@ -484,6 +484,8 @@ class VoteApiHandler extends ChangeNotifier {
         return WorldReviewsResponse.fromJson(
           Map<String, dynamic>.from(decoded),
         );
+      } else if (response.statusCode == 401) {
+        await invalidateCredentials();
       } else {
         //final message = decoded is Map && decoded['message'] is String
         //    ? decoded['message'] as String
@@ -530,11 +532,7 @@ class VoteApiHandler extends ChangeNotifier {
       if (response.statusCode == 401 ||
           errorId == 'ERR_INVALID_TOKEN' ||
           errorMessage.toLowerCase().contains('unauthenticated')) {
-        lastErrorMessage = 'You must be logged in to view your review.';
-        isLoggedIn = false;
-        sessionToken = null;
-        await SecureStorage().delete('vote_token');
-        notifyListeners();
+        await invalidateCredentials();
         return null;
       }
 
@@ -545,16 +543,23 @@ class VoteApiHandler extends ChangeNotifier {
       return null;
     } catch (e) {
       if (e.toString().contains('Unauthenticated')) {
-        lastErrorMessage = 'You must be logged in to view your review.';
-        isLoggedIn = false;
-        sessionToken = null;
-        await SecureStorage().delete('vote_token');
+        await invalidateCredentials();
       } else {
         lastErrorMessage = 'Network error: $e';
       }
       notifyListeners();
       return null;
     }
+  }
+
+
+  Future<void> invalidateCredentials() async{
+    lastErrorMessage = 'You must be logged in to view your review.';
+    isLoggedIn = false;
+    sessionToken = null;
+    await SecureStorage().delete('vote_token');
+    notifyListeners();
+    return;
   }
 }
 
@@ -675,11 +680,10 @@ class UpstreamWorldVoteInfo {
       'review_usr_icon': reviewUserIcon,
       'review_value': vote,
       'review_comment': comment,
-      if (tags != null && tags!.isNotEmpty)
-        'review_tags': tags!.entries
-          .where((entry) => entry.value != 0)
-          .map((entry) => {'tag_id': entry.key, 'vote': entry.value})
-            .toList(),
+      'review_tags': tags?.entries
+        .where((entry) => entry.value != 0)
+        .map((entry) => {'tag_id': entry.key, 'vote': entry.value})
+          .toList() ?? {},
     };
   }
 }

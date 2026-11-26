@@ -49,6 +49,7 @@ dependencies:
   hyperlink: ^0.0.4
   url_launcher: ^6.3.3
   ribbon_widget: ^1.0.5
+  native_spell_checker: ^0.4.0
   
 dev_dependencies:
   flutter_test:

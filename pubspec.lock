@@ -432,6 +432,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  native_spell_checker:
+    dependency: "direct main"
+    description:
+      name: native_spell_checker
+      sha256: "27bcd1f76b67a414aab1b3ae60aa8e99d900df9045d73d283817d6bbe2821926"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.4"
   objective_c:
     dependency: transitive
     description:

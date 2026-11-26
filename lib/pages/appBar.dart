@@ -7,6 +7,7 @@ import 'package:vrcwr/backend/appLogic.dart';
 Widget appBar(BuildContext context, Applogic aL) {
 
     int? hoveredTab;
+    bool filterAIWorlds = false;
 
     return  StatefulBuilder( 
       builder: (BuildContext context, StateSetter setState) {
@@ -149,6 +150,21 @@ Widget appBar(BuildContext context, Applogic aL) {
                     }
                   },
                 ),
+
+                SizedBox(width: 25,),
+
+                Checkbox(
+                  value: filterAIWorlds,
+                  onChanged: (value) {
+                    setState(() {
+                      filterAIWorlds = value ?? false;
+                    });
+                  },
+                ),
+                
+                SizedBox(width: 5,),
+
+                Text("Hide AI", textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
 
               ],
 
